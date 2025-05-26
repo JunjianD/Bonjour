@@ -22,9 +22,15 @@
         <module>bj-server-application</module>
         <module>bj-server-interfaces</module>
         <module>bj-server-strater</module>
+        <module>bj-common</module>
     </modules>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.38</version>
+        </dependency>
 
     </dependencies>
 
