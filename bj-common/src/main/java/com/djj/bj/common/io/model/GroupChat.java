@@ -6,36 +6,36 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 私发消息模型
+ * 群聊消息模型
  *
+ * @author jj_D
+ * @version 1.0
  * @projectName Bonjour
  * @package com.djj.bj.common.io.model
- * @className PrivateChat
- * @author jj_D
- * @date 2025/5/26 16:07
- * @version 1.0
+ * @className GroupChat
+ * @date 2025/5/26 20:33
  */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class PrivateChat<T> {
+public class GroupChat<T> {
     /**
-     * 发送者
+     * 发送者信息
      */
     private UserInfo sender;
 
     /**
-     * 接收者ID
+     * 接收者ID列表
      */
-    private Long receiverId;
+    private List<Long> receiverIds = new ArrayList<>();
 
     /**
      * 接收者终端类型
-     *
      * @default 所有终端
      */
     private List<Integer> receiverTerminals = TerminalType.getAllCodes();
