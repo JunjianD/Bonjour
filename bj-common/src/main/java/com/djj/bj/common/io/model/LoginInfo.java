@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** 用户登录信息
+/**
+ * 用户登录信息
+ *
  * @projectName Bonjour
  * @package com.djj.bj.common.io.model
  * @className LoginInfo

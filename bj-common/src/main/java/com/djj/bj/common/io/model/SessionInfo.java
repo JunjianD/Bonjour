@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** 保存登陆后的session，包括用户id以及登陆终端类型
+/**
+ * 保存登陆后的session，包括用户id以及登陆终端类型
+ *
  * @projectName Bonjour
  * @package com.djj.bj.common.io.model
  * @className SessionInfo

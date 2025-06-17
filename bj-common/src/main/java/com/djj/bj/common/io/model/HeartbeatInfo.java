@@ -1,6 +1,8 @@
 package com.djj.bj.common.io.model;
 
-/** 检测服务是否健康
+/**
+ * 检测服务是否健康
+ *
  * @projectName Bonjour
  * @package com.djj.bj.common.io.model
  * @className HeartbeatInfo

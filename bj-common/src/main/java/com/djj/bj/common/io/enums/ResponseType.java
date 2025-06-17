@@ -4,29 +4,30 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 监听枚举类型
+ * 发送消息的状态
  *
  * @author jj_D
  * @version 1.0
  * @projectName Bonjour
  * @package com.djj.bj.common.io.enums
- * @enumName ListeningType
- * @date 2025/5/26 17:29
+ * @enumName RESPONSETYPE
+ * @date 2025/5/26 20:04
  */
 @Getter
 @AllArgsConstructor
-public enum ListeningType {
-    ALL_MESSAGE(0, "全部消息"),
-    PRIVATE_MESSAGE(1, "私聊消息"),
-    GROUP_MESSAGE(2, "群聊消息");
+public enum ResponseType {
+    SUCCESS(0, "发送成功"),
+    OFFLINE(1, "用户不在线"),
+    MISSING_CHANNEL(2, "未搜寻到频道"),
+    UNKNOWN_ERROR(-1, "未知错误");
 
     /**
-     * 监听类型编码
+     * 响应类型编码
      */
     private final Integer code;
 
     /**
-     * 监听类型描述
+     * 响应类型描述
      */
     private final String description;
 }

@@ -9,7 +9,7 @@
         <version>1.0</version>
     </parent>
 
-    <artifactId>bj-server-strater</artifactId>
+    <artifactId>bj-server-starter</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

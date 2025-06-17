@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** 保存发送端用户信息，包括用户id以及登陆终端类型
+/**
+ * 保存用户信息，包括用户id以及登陆终端类型
+ *
  * @projectName Bonjour
  * @package com.djj.bj.common.io.model
  * @className UserInfo
@@ -17,7 +19,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SenderUserInfo {
+public class UserInfo {
     /**
      * 用户ID
      */
