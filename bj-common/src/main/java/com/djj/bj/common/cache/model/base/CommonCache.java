@@ -2,6 +2,7 @@ package com.djj.bj.common.cache.model.base;
 
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -16,6 +17,7 @@ import java.io.Serializable;
  */
 @Setter
 public class CommonCache implements Serializable {
+    @Serial
     private static final long serialVersionUID = 186993067788152652L;
     // 缓存数据是否存在
     protected boolean exist;

@@ -21,9 +21,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SendMessage<T> {
     /**
-     * SystemInfo的值id
+     * cmd的值id
      */
-    private Integer systeminfo;
+    private Integer systemInfo;
 
     /**
      * 消息内容
