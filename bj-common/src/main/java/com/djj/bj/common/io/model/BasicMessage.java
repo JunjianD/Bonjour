@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -23,6 +24,7 @@ import java.io.Serializable;
 @Setter
 public class BasicMessage implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 5206995993787592565L;
     /**
      * 消息目的地

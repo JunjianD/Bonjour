@@ -114,7 +114,7 @@ public class Constants {
     /**
      * 心跳次数
      */
-    public static final String HEARTBEAT_COUNT = "HEARTBEAT_COUNT";
+    public static final String HEARTBEAT_COUNTS = "HEARTBEAT_COUNTS";
 
     /**
      * 解码时 读取最小字节数

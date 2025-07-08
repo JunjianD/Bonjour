@@ -1,7 +1,0 @@
-tcpsocket:
-  enable: true
-  port: 8879
-
-websocket:
-  enable: true
-  port: 8880

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.List;
 
 /**
@@ -22,12 +23,13 @@ import java.util.List;
 @Setter
 @Getter
 public class ReceiveMessage extends BasicMessage {
+    @Serial
     private static final long serialVersionUID = 6903359647887948369L;
 
     /**
      * 命令类型
      */
-    private Integer systeminfo;
+    private Integer systemInfo;
 
     /**
      * 发送消息的用户信息
@@ -37,7 +39,7 @@ public class ReceiveMessage extends BasicMessage {
     /**
      * 接收消息的用户列表
      */
-    List<UserInfo> receiver;
+    List<UserInfo> receivers;
 
     /**
      * 是否需要回调发送结果
