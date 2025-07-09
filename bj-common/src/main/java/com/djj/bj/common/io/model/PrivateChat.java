@@ -44,7 +44,7 @@ public class PrivateChat<T> {
      * 是否发送给自己的其他终端
      * @default true
      */
-    private Boolean sendToSelfOtherTerminal = true;
+    private Boolean sendToSelfOtherTerminals = true;
 
     /**
      * 是否返回发送结果
