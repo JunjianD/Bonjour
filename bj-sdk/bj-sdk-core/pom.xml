@@ -5,20 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.djj</groupId>
-        <artifactId>Bonjour</artifactId>
+        <artifactId>bj-sdk</artifactId>
         <version>1.0</version>
     </parent>
 
-    <artifactId>bj-sdk</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>bj-sdk-application</module>
-        <module>bj-sdk-core</module>
-        <module>bj-sdk-domain</module>
-        <module>bj-sdk-interfaces</module>
-        <module>bj-sdk-infrastructure</module>
-    </modules>
+    <artifactId>bj-sdk-core</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -29,8 +20,8 @@
     <dependencies>
         <dependency>
             <groupId>com.djj</groupId>
-            <artifactId>bj-common</artifactId>
-            <version>1.0</version>
+            <artifactId>bj-sdk-interfaces</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
