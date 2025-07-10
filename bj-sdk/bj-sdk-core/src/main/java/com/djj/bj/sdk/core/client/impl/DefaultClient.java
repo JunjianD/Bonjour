@@ -1,5 +1,6 @@
 package com.djj.bj.sdk.core.client.impl;
 
+import com.djj.bj.common.io.model.GroupChat;
 import com.djj.bj.common.io.model.PrivateChat;
 import com.djj.bj.sdk.core.client.Client;
 import com.djj.bj.sdk.interfaces.sender.Sender;
@@ -25,5 +26,10 @@ public class DefaultClient implements Client {
     @Override
     public <T> void sendPrivateMessage(PrivateChat<T> privateChat) {
         sender.sendPrivateMessage(privateChat);
+    }
+
+    @Override
+    public <T> void sendGroupMessage(GroupChat<T> groupChat) {
+        sender.sendGroupMessage(groupChat);
     }
 }
