@@ -8,6 +8,7 @@ import com.djj.bj.common.io.constants.Constants;
 import com.djj.bj.common.io.enums.ListeningType;
 import com.djj.bj.common.io.enums.ResponseType;
 import com.djj.bj.common.io.enums.SystemInfoType;
+import com.djj.bj.common.io.enums.TerminalType;
 import com.djj.bj.common.io.model.*;
 import com.djj.bj.common.mq.MessageSenderService;
 import com.djj.bj.sdk.infrastructure.multicaster.MessageListenerMulticaster;
@@ -81,6 +82,46 @@ public class DefaultSender implements Sender {
         this.sendGroupChatToTargetUsers(serverIdMap,offlineUsers, groupChat);
         this.sendGroupChatToSelf(groupChat, receiveTerminals);
 
+    }
+
+    @Override
+    public Map<Long, List<TerminalType>> getOnlineTerminalMap(List<Long> userIds) {
+        if(CollectionUtil.isEmpty(userIds)){
+            return Collections.emptyMap();
+        }
+        Map<String, UserInfo> userInfoMap = new HashMap<>(userIds.size());
+        for(Long userId : userIds){
+            for(Integer terminalType : TerminalType.getAllCodes()){
+                String redisKey = String.join(Constants.REDIS_KEY_SPLIT, Constants.USER_SERVER_ID, userId.toString(), terminalType.toString());
+                userInfoMap.put(redisKey, new UserInfo(userId, terminalType));
+            }
+        }
+
+        // 批量拉取数据,获取服务器id
+        List<String> serverIds = distributeCacheService.multiGet(userInfoMap.keySet());
+        int idx = 0;
+        Map<Long,List<TerminalType>> onlineTerminalMap = new HashMap<>(userIds.size());
+        for(Map.Entry<String,UserInfo> entry : userInfoMap.entrySet()){
+            String serverIdStr = serverIds.get(idx++);
+            if(!StrUtil.isEmpty(serverIdStr)){
+                UserInfo userInfo = entry.getValue();
+                List<TerminalType> onlineTerminalTypes = onlineTerminalMap.computeIfAbsent(userInfo.getUserId(), k -> new LinkedList<>());
+                onlineTerminalTypes.add(TerminalType.fromCode(userInfo.getTerminalType()));
+            }
+        }
+        return onlineTerminalMap;
+    }
+
+    @Override
+    public Boolean isOnline(Long userId) {
+        String redisKey = String.join(Constants.REDIS_KEY_SPLIT, Constants.USER_SERVER_ID, userId.toString(),"*");
+        Set<String> keysSet = distributeCacheService.getAllKeys(redisKey);
+        return !CollectionUtil.isEmpty(keysSet);
+    }
+
+    @Override
+    public List<Long> getOnlineUserIds(List<Long> userIds) {
+        return new LinkedList<>(this.getOnlineTerminalMap(userIds).keySet());
     }
 
     /**
