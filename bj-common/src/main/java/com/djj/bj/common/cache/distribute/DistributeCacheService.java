@@ -3,7 +3,6 @@ package com.djj.bj.common.cache.distribute;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
 import com.djj.bj.common.cache.distribute.conversion.TypeConversion;
 
@@ -94,7 +93,7 @@ public interface DistributeCacheService {
      * @param pattern 正则表达式
      * @return key集合
      */
-    Set<String> multiGetKeys(String pattern);
+    Set<String> getAllKeys(String pattern);
 
     /**
      * 删除缓存

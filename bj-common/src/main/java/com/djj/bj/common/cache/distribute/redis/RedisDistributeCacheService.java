@@ -120,7 +120,7 @@ public class RedisDistributeCacheService implements DistributeCacheService {
     }
 
     @Override
-    public Set<String> multiGetKeys(String pattern) {
+    public Set<String> getAllKeys(String pattern) {
         return stringRedisTemplate.keys(pattern);
     }
 
