@@ -1,5 +1,6 @@
 package com.djj.bj.sdk.interfaces.sender;
 
+import com.djj.bj.common.io.model.GroupChat;
 import com.djj.bj.common.io.model.PrivateChat;
 
 /**
@@ -20,4 +21,12 @@ public interface Sender {
      * @param <T>         消息内容类型
      */
     <T> void sendPrivateMessage(PrivateChat<T> privateChat);
+
+    /**
+     * 发送群聊消息
+     *
+     * @param groupChat 群聊消息对象
+     * @param <T>       消息内容类型
+     */
+    <T> void sendGroupMessage(GroupChat<T> groupChat);
 }

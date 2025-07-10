@@ -1,5 +1,6 @@
 package com.djj.bj.sdk.core.client;
 
+import com.djj.bj.common.io.model.GroupChat;
 import com.djj.bj.common.io.model.PrivateChat;
 
 /**
@@ -20,4 +21,12 @@ public interface Client {
      * @param <T>         消息类型
      */
     <T> void sendPrivateMessage(PrivateChat<T> privateChat);
+
+    /**
+     * 发送群聊消息
+     *
+     * @param groupChat 群聊消息
+     * @param <T>       消息类型
+     */
+    <T> void sendGroupMessage(GroupChat<T> groupChat);
 }
