@@ -1,6 +1,6 @@
 package com.djj.bj.server.application.consumer;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.djj.bj.common.io.constants.Constants;
 import com.djj.bj.common.io.model.ReceiveMessage;
 

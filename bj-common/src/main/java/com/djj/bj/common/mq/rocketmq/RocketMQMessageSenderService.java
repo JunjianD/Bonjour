@@ -1,6 +1,6 @@
 package com.djj.bj.common.mq.rocketmq;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.djj.bj.common.io.constants.Constants;
 import com.djj.bj.common.io.model.BasicMessage;
 import com.djj.bj.common.mq.MessageSenderService;
