@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.djj</groupId>
+        <artifactId>Bonjour</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>bj-platform</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>bj-platform-common</module>
+        <module>bj-platform-user</module>
+        <module>bj-platform-friend</module>
+        <module>bj-platform-message</module>
+        <module>bj-platform-group</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.djj</groupId>
+            <artifactId>bj-common</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+
+</project>
