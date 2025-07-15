@@ -24,6 +24,6 @@ public enum HttpCode {
     USERNAME_ALREADY_REGISTER(10003, "用户名已被使用"),
     XSS_PARAM_ERROR(10004, "输入存在非法内容");
 
-    private final int code;
+    private final Integer code;
     private final String message;
 }
