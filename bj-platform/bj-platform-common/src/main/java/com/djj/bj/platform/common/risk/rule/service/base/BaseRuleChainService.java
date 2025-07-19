@@ -1,10 +1,12 @@
 package com.djj.bj.platform.common.risk.rule.service.base;
 
 import com.djj.bj.platform.common.risk.rule.service.RuleChainService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.server.reactive.ServerHttpRequest;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * 基础规则链服务抽象类
@@ -18,6 +20,11 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
  */
 public abstract class BaseRuleChainService implements RuleChainService {
     private final Logger logger = LoggerFactory.getLogger(BaseRuleChainService.class);
+
+    private static final String UNKNOWN = "unknown";
+    private static final String LOCALHOST_IP = "127.0.0.1";
+    private static final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
+    private static final String SEPARATOR = ",";
 
     /**
      * 当前服务名称
@@ -36,34 +43,49 @@ public abstract class BaseRuleChainService implements RuleChainService {
      * @param request ServerHttpRequest 请求对象
      * @return String 返回IP地址
      */
-    protected String getIP(ServerHttpRequest request) {
-        HttpHeaders headers = request.getHeaders();
-        String ip = headers.getFirst("x-Forwarded-For");
-        if (ip != null && !ip.isEmpty() && !ip.equalsIgnoreCase("unknown")) {
-            // 多次反向代理后会有多个ip值，第一个ip为真实ip
-            if (ip.contains(",")) {
-                ip = ip.split(",")[0].trim();
+    protected String getIP(HttpServletRequest request) {
+        if (request == null) {
+            return UNKNOWN;
+        }
+        String ip = request.getHeader("x-Forwarded-For");
+
+        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase(UNKNOWN)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase(UNKNOWN)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+//        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase(UNKNOWN)) {
+//            ip = request.getHeader("HTTP_CLIENT_IP");
+//        }
+//        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase(UNKNOWN)) {
+//            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+//        }
+        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase(UNKNOWN)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase(UNKNOWN)) {
+            ip = request.getRemoteAddr();
+            if (LOCALHOST_IP.equalsIgnoreCase(ip) || LOCALHOST_IPV6.equalsIgnoreCase(ip)) {
+                // 根据网卡取本机配置的 IP
+                InetAddress inetAddress = null;
+                try {
+                    inetAddress = InetAddress.getLocalHost();
+                } catch (UnknownHostException e) {
+                    logger.error("BaseRuleChainService.getIP | 获取客户端IP地址异常 | {}", e.getMessage());
+                }
+                if (inetAddress != null) {
+                    ip = inetAddress.getHostAddress();
+                }
             }
         }
-        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase("unknown")) {
-            ip = headers.getFirst("Proxy-Client-IP");
+        // 对于通过多个代理的情况，分割出第一个 IP
+        if (ip != null && ip.length() > 15) {
+            if (ip.indexOf(SEPARATOR) > 0) {
+                ip = ip.substring(0, ip.indexOf(SEPARATOR));
+            }
         }
-        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase("unknown")) {
-            ip = headers.getFirst("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase("unknown")) {
-            ip = headers.getFirst("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase("unknown")) {
-            ip = headers.getFirst("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase("unknown")) {
-            ip = headers.getFirst("X-Real-IP");
-        }
-        if (ip == null || ip.isEmpty() || ip.equalsIgnoreCase("unknown")) {
-            ip = request.getRemoteAddress().getAddress().getHostAddress();
-        }
-        return ip.replaceAll(":", ".");
+        return LOCALHOST_IPV6.equals(ip) ? LOCALHOST_IP : ip;
     }
 
 }
