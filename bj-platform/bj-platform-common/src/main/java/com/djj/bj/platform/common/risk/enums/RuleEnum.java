@@ -17,6 +17,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum RuleEnum {
     XSS(0, "XSS安全服务"),
+    IP(1, "IP安全服务"),
     AUTH(10, "认证服务");
 
     private final Integer code;
