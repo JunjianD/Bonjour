@@ -3,8 +3,10 @@ package com.djj.bj.platform.common.risk.rule.service.base;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.djj.bj.common.io.jwt.JwtUtils;
+import com.djj.bj.platform.common.exception.BJException;
 import com.djj.bj.platform.common.jwt.JwtProperties;
 import com.djj.bj.platform.common.model.constants.PlatformConstants;
+import com.djj.bj.platform.common.model.enums.HttpCode;
 import com.djj.bj.platform.common.risk.rule.service.RuleChainService;
 import com.djj.bj.platform.common.session.UserSession;
 import jakarta.annotation.Resource;
@@ -101,6 +103,13 @@ public abstract class BaseRuleChainService implements RuleChainService {
         return LOCALHOST_IPV6.equals(ip) ? LOCALHOST_IP : ip;
     }
 
+    /**
+     * 从请求中获取 UserSession
+     * 如果获取失败，返回 null
+     *
+     * @param request HttpServletRequest 请求对象
+     * @return UserSession 用户会话信息
+     */
     protected UserSession getUserSessionWithoutException(HttpServletRequest request) {
         // 从 http 请求头中取出 token
         String token = request.getHeader(PlatformConstants.ACCESS_TOKEN);
@@ -114,6 +123,33 @@ public abstract class BaseRuleChainService implements RuleChainService {
         String strJson = JwtUtils.getInfo(token);
         if (StrUtil.isEmpty(strJson)) {
             return null;
+        }
+        return JSON.parseObject(strJson, UserSession.class);
+    }
+
+    /**
+     * 获取 UserSession
+     * 如果未登录或 token 无效，抛出异常
+     *
+     * @param request HttpServletRequest 请求对象
+     * @return UserSession 用户会话信息
+     */
+    protected UserSession getUserSession(HttpServletRequest request) {
+        String token = request.getHeader(PlatformConstants.ACCESS_TOKEN);
+        if (StrUtil.isEmpty(token)) {
+            logger.error("BaseRuleChainService | 未登录，url | {}", request.getRequestURI());
+            throw new BJException(HttpCode.NO_LOGIN);
+        }
+        // 验证 token
+        if (!JwtUtils.checkSign(token, jwtProperties.getAccessTokenSecret())) {
+            logger.error("BaseRuleChainService | token已失效，url | {}", request.getRequestURI());
+            throw new BJException(HttpCode.INVALID_TOKEN);
+        }
+        // 存放 session
+        String strJson = JwtUtils.getInfo(token);
+        if (StrUtil.isEmpty(strJson)) {
+            logger.error("BaseRuleChainService | token已失效，url | {}", request.getRequestURI());
+            throw new BJException(HttpCode.INVALID_TOKEN);
         }
         return JSON.parseObject(strJson, UserSession.class);
     }
