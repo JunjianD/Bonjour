@@ -31,6 +31,11 @@ public class PlatformConstants {
      */
     public static final String RISK_CONTROL_KEY_PREFIX = "risk:control:";
 
+    /**
+     * AccessToken
+     */
+    public static final String ACCESS_TOKEN = "accessToken";
+
     public static String getKey(String prefix, String key) {
         return prefix.concat(key);
     }
