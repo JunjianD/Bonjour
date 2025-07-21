@@ -1,6 +1,13 @@
 package com.djj.bj.platform.common.risk.rule.service.base;
 
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
+import com.djj.bj.common.io.jwt.JwtUtils;
+import com.djj.bj.platform.common.jwt.JwtProperties;
+import com.djj.bj.platform.common.model.constants.PlatformConstants;
 import com.djj.bj.platform.common.risk.rule.service.RuleChainService;
+import com.djj.bj.platform.common.session.UserSession;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +27,12 @@ import java.net.UnknownHostException;
  */
 public abstract class BaseRuleChainService implements RuleChainService {
     private final Logger logger = LoggerFactory.getLogger(BaseRuleChainService.class);
+
+    @Resource
+    private JwtProperties jwtProperties;
+
+    protected static final int DEFAULT_WINDOWS_SIZE = 50;
+    protected static final int DEFAULT_WINDOWS_PERIOD = 1000;
 
     private static final String UNKNOWN = "unknown";
     private static final String LOCALHOST_IP = "127.0.0.1";
@@ -86,6 +99,23 @@ public abstract class BaseRuleChainService implements RuleChainService {
             }
         }
         return LOCALHOST_IPV6.equals(ip) ? LOCALHOST_IP : ip;
+    }
+
+    protected UserSession getUserSessionWithoutException(HttpServletRequest request) {
+        // 从 http 请求头中取出 token
+        String token = request.getHeader(PlatformConstants.ACCESS_TOKEN);
+        if (StrUtil.isEmpty(token)) {
+            return null;
+        }
+        // 验证 token 并获取 UserSession
+        if (!JwtUtils.checkSign(token, jwtProperties.getAccessTokenSecret())) {
+            return null;
+        }
+        String strJson = JwtUtils.getInfo(token);
+        if (StrUtil.isEmpty(strJson)) {
+            return null;
+        }
+        return JSON.parseObject(strJson, UserSession.class);
     }
 
 }
