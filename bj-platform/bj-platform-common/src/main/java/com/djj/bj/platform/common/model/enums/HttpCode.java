@@ -19,6 +19,7 @@ public enum HttpCode {
     SUCCESS(200, "请求成功"),
     NO_LOGIN(400, "未登录"),
     INVALID_TOKEN(401, "token无效或已过期"),
+    PARAMS_ERROR(402, "参数错误"),
     PROGRAM_ERROR(500, "系统繁忙，请稍后再试"),
     PASSWORD_ERROR(10001, "密码不正确"),
     USERNAME_ALREADY_REGISTER(10003, "用户名已被使用"),
