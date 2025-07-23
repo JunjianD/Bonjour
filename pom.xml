@@ -140,6 +140,30 @@
                 <artifactId>commons-io</artifactId>
                 <version>2.19.0</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>2.8.9</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>6.5.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.coobird</groupId>
+                <artifactId>thumbnailator</artifactId>
+                <version>0.4.20</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>9.3.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
