@@ -1,5 +1,6 @@
 package com.djj.bj.platform.user.application.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.djj.bj.common.cache.distribute.DistributeCacheService;
 import com.djj.bj.common.cache.id.SnowFlakeFactory;
@@ -8,10 +9,14 @@ import com.djj.bj.platform.common.exception.BJException;
 import com.djj.bj.platform.common.jwt.JwtProperties;
 import com.djj.bj.platform.common.model.constants.PlatformConstants;
 import com.djj.bj.platform.common.model.dto.LoginDTO;
+import com.djj.bj.platform.common.model.dto.ModifyPwdDTO;
 import com.djj.bj.platform.common.model.dto.RegisterDTO;
 import com.djj.bj.platform.common.model.entity.User;
 import com.djj.bj.platform.common.model.enums.HttpCode;
 import com.djj.bj.platform.common.model.vo.LoginVO;
+import com.djj.bj.platform.common.model.vo.OnlineTerminalVO;
+import com.djj.bj.platform.common.model.vo.UserVO;
+import com.djj.bj.platform.common.session.SessionContext;
 import com.djj.bj.platform.common.session.UserSession;
 import com.djj.bj.platform.common.utils.BeanUtils;
 import com.djj.bj.platform.user.application.service.UserService;
@@ -21,8 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -134,5 +142,104 @@ public class UserServiceImpl implements UserService {
         loginVO.setRefreshToken(newRefreshToken);
         loginVO.setRefreshTokenExpireTime(jwtProperties.getRefreshTokenExpireIn());
         return loginVO;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void modifyPassword(ModifyPwdDTO dto) {
+        // 获取用户Session
+        UserSession session = SessionContext.getUserSession();
+        // 不从缓存中获取，防止缓存数据不一致
+        User user = userDomainService.getById(session.getUserId());
+        if (user == null) {
+            throw new BJException("用户不存在");
+        }
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new BJException("旧密码不正确");
+        }
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userDomainService.saveOrUpdateUser(user);
+        logger.info("用户修改密码，用户id:{},用户名:{},昵称:{}", user.getId(), user.getUserName(), user.getNickName());
+    }
+
+    @Override
+    public User findUserByUserName(String username) {
+        User user = distributeCacheService.queryWithPassThrough(
+                PlatformConstants.PLATFORM_REDIS_USER_KEY,
+                username,
+                User.class,
+                userDomainService::getUserByUserName,
+                PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME,
+                TimeUnit.MINUTES
+        );
+        if (user == null) {
+            throw new BJException(HttpCode.PROGRAM_ERROR, "当前用户不存在");
+        }
+        return user;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(UserVO vo) {
+        UserSession session = SessionContext.getUserSession();
+        if (!session.getUserId().equals(vo.getUserId())) {
+            throw new BJException(HttpCode.PROGRAM_ERROR, "只能更新自己的信息");
+        }
+        User user = userDomainService.getById(vo.getUserId());
+        if (Objects.isNull(user)) {
+            throw new BJException(HttpCode.PROGRAM_ERROR, "用户不存在");
+        }
+        // 如果用户更新了昵称和头像，则更新好友昵称和头像
+        if (!user.getNickName().equals(vo.getNickName()) || !user.getHeadImageThumb().equals(vo.getHeadImageThumb())) {
+            //TODO 后续完善
+        }
+        // 如果用户更新了昵称和头像，则更新群聊中的头像
+        if (!user.getNickName().equals(vo.getNickName()) || !user.getHeadImageThumb().equals(vo.getHeadImageThumb())) {
+            //TODO 后续完善
+        }
+
+        // 更新用户的基本信息
+        if (!StrUtil.isEmpty(vo.getNickName())) {
+            user.setNickName(vo.getNickName());
+        }
+        if (vo.getSex() != null) {
+            user.setSex(vo.getSex());
+        }
+        if (!StrUtil.isEmpty(vo.getSignature())) {
+            user.setSignature(vo.getSignature());
+        }
+        if (!StrUtil.isEmpty(vo.getHeadImage())) {
+            user.setHeadImage(vo.getHeadImage());
+        }
+        if (!StrUtil.isEmpty(vo.getHeadImageThumb())) {
+            user.setHeadImageThumb(vo.getHeadImageThumb());
+        }
+        userDomainService.saveOrUpdateUser(user);
+    }
+
+    @Override
+    public UserVO findUserById(Long id, boolean constantsOnlineFlag) {
+        User user = userDomainService.getUserById(id);
+        UserVO vo = BeanUtils.copyProperties(user, UserVO.class);
+        // TODO 设置用户的终端数据，通过IMClient获取
+        if (constantsOnlineFlag) {
+            // TODO 设置在线状态
+            // vo.setOnline();
+        }
+//        vo.setOnline();
+        return null;
+    }
+
+    @Override
+    public List<UserVO> findUserByName(String name) {
+        List<User> userList = userDomainService.findUserByName(name);
+        // TODO 调用Client的方法后处理在线状态
+        return null;
+    }
+
+    @Override
+    public List<OnlineTerminalVO> getOnlineTerminals(String userIds) {
+        //TODO 调用IMClient的方法来获取终端数据
+        return null;
     }
 }

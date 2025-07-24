@@ -1,5 +1,6 @@
 package com.djj.bj.platform.user.domain.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -11,6 +12,7 @@ import com.djj.bj.platform.user.domain.repository.UserRepository;
 import com.djj.bj.platform.user.domain.service.UserDomainService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,6 +55,24 @@ public class UserDomainServiceImpl extends ServiceImpl<UserRepository, User> imp
                 .or().like(User::getNickName, name)
                 .last("limit 20");
         return this.list(queryWrapper);
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return super.getById(id);
+    }
+
+    @Override
+    public List<User> findUserByName(String name) {
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.like(User::getUserName, name)
+                .or().like(User::getNickName, name)
+                .last("limit 20");
+        List<User> userList = this.list(queryWrapper);
+        if (CollectionUtil.isEmpty(userList)) {
+            return Collections.emptyList();
+        }
+        return userList;
     }
 
 }

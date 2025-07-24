@@ -1,8 +1,14 @@
 package com.djj.bj.platform.user.application.service;
 
 import com.djj.bj.platform.common.model.dto.LoginDTO;
+import com.djj.bj.platform.common.model.dto.ModifyPwdDTO;
 import com.djj.bj.platform.common.model.dto.RegisterDTO;
+import com.djj.bj.platform.common.model.entity.User;
 import com.djj.bj.platform.common.model.vo.LoginVO;
+import com.djj.bj.platform.common.model.vo.OnlineTerminalVO;
+import com.djj.bj.platform.common.model.vo.UserVO;
+
+import java.util.List;
 
 /**
  * 用户服务接口
@@ -38,4 +44,51 @@ public interface UserService {
      * @return 刷新后的登录信息值对象
      */
     LoginVO refreshToken(String refreshToken);
+
+    /**
+     * 修改用户密码
+     *
+     * @param dto 修改密码数据传输对象
+     */
+    void modifyPassword(ModifyPwdDTO dto);
+
+    /**
+     * 根据用户名查询用户
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
+    User findUserByUserName(String username);
+
+    /**
+     * 更新用户信息
+     *
+     * @param vo 用户信息值对象
+     */
+    void update(UserVO vo);
+
+    /**
+     * 根据用户ID查询用户信息和在线状态
+     *
+     * @param id                  用户ID
+     * @param constantsOnlineFlag 是否使用常量在线标志
+     * @return 用户信息值对象
+     */
+    UserVO findUserById(Long id, boolean constantsOnlineFlag);
+
+    /**
+     * 根据用户昵称查询用户，最多返回20条数据
+     *
+     * @param name 用户名或昵称
+     * @return 用户信息列表
+     */
+    List<UserVO> findUserByName(String name);
+
+    /**
+     * 获取用户在线的终端类型
+     *
+     * @param userIds 用户ID，多个用逗号分隔
+     * @return 在线用户终端信息列表
+     */
+    List<OnlineTerminalVO> getOnlineTerminals(String userIds);
 }
