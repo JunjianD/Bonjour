@@ -38,4 +38,20 @@ public interface UserDomainService extends IService<User> {
      * @return List<User> 用户列表
      */
     List<User> getUserListByName(String name);
+
+    /**
+     * 根据用户ID查询用户信息
+     *
+     * @param id 用户ID
+     * @return User 用户信息
+     */
+    User getUserById(Long id);
+
+    /**
+     * 根据名称模糊查询用户列表
+     *
+     * @param name 用户名
+     * @return List<User> 用户列表
+     */
+    List<User> findUserByName(String name);
 }

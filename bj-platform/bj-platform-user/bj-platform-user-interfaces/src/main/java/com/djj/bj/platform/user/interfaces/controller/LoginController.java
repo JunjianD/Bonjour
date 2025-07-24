@@ -1,6 +1,7 @@
 package com.djj.bj.platform.user.interfaces.controller;
 
 import com.djj.bj.platform.common.model.dto.LoginDTO;
+import com.djj.bj.platform.common.model.dto.ModifyPwdDTO;
 import com.djj.bj.platform.common.model.dto.RegisterDTO;
 import com.djj.bj.platform.common.model.vo.LoginVO;
 import com.djj.bj.platform.common.response.ResponseMessage;
@@ -47,5 +48,12 @@ public class LoginController {
     public ResponseMessage<LoginVO> refreshToken(@RequestHeader("refreshToken") String refreshToken) {
         LoginVO vo = userService.refreshToken(refreshToken);
         return ResponseMessageFactory.getSuccessResponseMessage(vo);
+    }
+
+    @PutMapping("/modifyPwd")
+    @Operation(summary = "修改密码", description = "修改用户密码")
+    public ResponseMessage<String> modifyPassword(@Valid @RequestBody ModifyPwdDTO dto) {
+        userService.modifyPassword(dto);
+        return ResponseMessageFactory.getSuccessResponseMessage("密码修改成功");
     }
 }
