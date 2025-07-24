@@ -30,4 +30,12 @@ public interface UserService {
      * @param dto 注册数据传输对象
      */
     void register(RegisterDTO dto);
+
+    /**
+     * 刷新Token
+     *
+     * @param refreshToken 刷新令牌
+     * @return 刷新后的登录信息值对象
+     */
+    LoginVO refreshToken(String refreshToken);
 }
