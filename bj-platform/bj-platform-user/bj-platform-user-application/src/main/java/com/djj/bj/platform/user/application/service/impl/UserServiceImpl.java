@@ -117,4 +117,22 @@ public class UserServiceImpl implements UserService {
         userDomainService.saveOrUpdateUser(user);
         logger.info("用户注册成功，用户id:{},用户名:{},昵称:{}", user.getId(), dto.getUserName(), dto.getNickName());
     }
+
+    @Override
+    public LoginVO refreshToken(String refreshToken) {
+        // 验证token
+        if (!JwtUtils.checkSign(refreshToken, jwtProperties.getRefreshTokenSecret())) {
+            throw new BJException("refreshToken无效或已过期");
+        }
+        String strJson = JwtUtils.getInfo(refreshToken);
+        Long userId = JwtUtils.getUserId(refreshToken);
+        String accessToken = JwtUtils.sign(userId, strJson, jwtProperties.getAccessTokenExpireIn(), jwtProperties.getAccessTokenSecret());
+        String newRefreshToken = JwtUtils.sign(userId, strJson, jwtProperties.getRefreshTokenExpireIn(), jwtProperties.getRefreshTokenSecret());
+        LoginVO loginVO = new LoginVO();
+        loginVO.setAccessToken(accessToken);
+        loginVO.setAccessTokenExpireTime(jwtProperties.getAccessTokenExpireIn());
+        loginVO.setRefreshToken(newRefreshToken);
+        loginVO.setRefreshTokenExpireTime(jwtProperties.getRefreshTokenExpireIn());
+        return loginVO;
+    }
 }

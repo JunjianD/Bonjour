@@ -10,9 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 用户登录认证授权相关接口
@@ -42,5 +40,12 @@ public class LoginController {
     public ResponseMessage<String> register(@Valid @RequestBody RegisterDTO dto) {
         userService.register(dto);
         return ResponseMessageFactory.getSuccessResponseMessage("注册成功");
+    }
+
+    @PutMapping("/refreshToken")
+    @Operation(summary = "刷新Token", description = "使用RefreshToken换取新的Token")
+    public ResponseMessage<LoginVO> refreshToken(@RequestHeader("refreshToken") String refreshToken) {
+        LoginVO vo = userService.refreshToken(refreshToken);
+        return ResponseMessageFactory.getSuccessResponseMessage(vo);
     }
 }
