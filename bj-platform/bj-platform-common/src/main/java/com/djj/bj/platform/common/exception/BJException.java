@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.io.Serial;
 
 /**
- * TODO
+ * 自定义异常类，用于处理平台相关的异常情况
  *
  * @author jj_D
  * @version 1.0
