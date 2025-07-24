@@ -29,10 +29,10 @@ import java.util.Map;
 public class XssRuleChainService extends BaseRuleChainService {
     private static final Logger logger = LoggerFactory.getLogger(XssRuleChainService.class);
 
-    @Value("{bj.rule.xssRule.enabled}")
+    @Value("${bj.rule.xssRule.enabled}")
     private Boolean xssRuleEnabled;
 
-    @Value("{bj.rule.xssRule.order}")
+    @Value("${bj.rule.xssRule.order}")
     private Integer xssRuleOrder;
 
     @Override
