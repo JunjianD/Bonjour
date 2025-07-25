@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2025/6/4 20:09
  */
 @Component
-@ConditionalOnProperty(name="distribute.type.lock", havingValue = "redisson")
+@ConditionalOnProperty(name = "distributed.lock.type", havingValue = "redisson")
 public class RedissonLockFactory implements DistributedLockFactory {
     private final Logger logger = LoggerFactory.getLogger(RedissonLockFactory.class);
 
