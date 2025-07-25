@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @ControllerAdvice
 public class BJExceptionHandler {
-    Logger logger = LoggerFactory.getLogger(BJExceptionHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(BJExceptionHandler.class);
 
     @ResponseBody
     @ExceptionHandler(value = BJException.class)
