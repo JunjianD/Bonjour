@@ -36,6 +36,36 @@ public class PlatformConstants {
      */
     public static final String ACCESS_TOKEN = "accessToken";
 
+    /**
+     * 本地事件类型
+     */
+    public static final String EVENT_PUBLISH_TYPE_LOCAL = "local";
+
+    /**
+     * RocketMQ事件类型
+     */
+    public static final String EVENT_PUBLISH_TYPE_ROCKETMQ = "rocketmq";
+
+    /**
+     * 用户事件TOPIC
+     */
+    public static final String TOPIC_EVENT_ROCKETMQ_USER = "topic_event_rocketmq_user";
+
+    /**
+     * 本地订阅事件
+     */
+    public static final String TOPIC_EVENT_LOCAL = "topic_event_local";
+
+    /**
+     * 更新用户分布式缓存时用的锁前缀
+     */
+    public static final String IM_USER_UPDATE_CACHE_LOCK_KEY = "IM_USER_UPDATE_CACHE_LOCK_KEY_";
+
+    /**
+     * 用户事件消费分组
+     */
+    public static final String EVENT_USER_CONSUMER_GROUP = "event_user_consumer_group";
+
     public static String getKey(String prefix, String key) {
         return prefix.concat(key);
     }
