@@ -29,7 +29,7 @@ public interface UserDomainService extends IService<User> {
      *
      * @param user 用户信息
      */
-    void saveOrUpdateUser(User user);
+    boolean saveOrUpdateUser(User user);
 
     /**
      * 根据名称模糊查询用户列表

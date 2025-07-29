@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * TODO
+ * spring mvc配置类
  *
  * @author jj_D
  * @version 1.0
@@ -29,7 +29,8 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(interceptor)
                 .addPathPatterns("/**") // 拦截所有请求
                 .excludePathPatterns("/login", "/logout", "/register", "/refreshToken",
-                        "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**"); // 排除登录、注册和登出接口
+                        "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**",
+                        "/v3/api-docs/**"); // 排除登录、注册和登出接口
     }
 
     @Bean

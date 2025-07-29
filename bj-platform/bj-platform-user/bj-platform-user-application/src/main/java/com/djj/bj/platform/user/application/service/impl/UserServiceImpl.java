@@ -1,9 +1,11 @@
 package com.djj.bj.platform.user.application.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.djj.bj.common.cache.distribute.DistributeCacheService;
 import com.djj.bj.common.cache.id.SnowFlakeFactory;
+import com.djj.bj.common.io.enums.TerminalType;
 import com.djj.bj.common.io.jwt.JwtUtils;
 import com.djj.bj.platform.common.exception.BJException;
 import com.djj.bj.platform.common.jwt.JwtProperties;
@@ -21,6 +23,7 @@ import com.djj.bj.platform.common.session.UserSession;
 import com.djj.bj.platform.common.utils.BeanUtils;
 import com.djj.bj.platform.user.application.service.UserService;
 import com.djj.bj.platform.user.domain.service.UserDomainService;
+import com.djj.bj.sdk.core.client.Client;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -58,6 +59,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private JwtProperties jwtProperties;
+
+    @Resource
+    private Client client;
 
     @Override
     public LoginVO login(LoginDTO dto) {
@@ -219,27 +223,59 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO findUserById(Long id, boolean constantsOnlineFlag) {
-        User user = userDomainService.getUserById(id);
-        UserVO vo = BeanUtils.copyProperties(user, UserVO.class);
-        // TODO 设置用户的终端数据，通过IMClient获取
-        if (constantsOnlineFlag) {
-            // TODO 设置在线状态
-            // vo.setOnline();
+        User user = distributeCacheService.queryWithPassThrough(
+                PlatformConstants.PLATFORM_REDIS_USER_KEY,
+                id,
+                User.class,
+                userDomainService::getById,
+                PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME,
+                TimeUnit.MINUTES
+        );
+        if (user == null) {
+            throw new BJException(HttpCode.PROGRAM_ERROR, "用户不存在");
         }
-//        vo.setOnline();
+        UserVO vo = BeanUtils.copyProperties(user, UserVO.class);
+        if (constantsOnlineFlag) {
+            vo.setOnline(client.isOnline(id));
+        }
         return null;
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+        return distributeCacheService.queryWithPassThrough(
+                PlatformConstants.PLATFORM_REDIS_USER_KEY,
+                userId,
+                User.class,
+                userDomainService::getById,
+                PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME,
+                TimeUnit.MINUTES
+        );
     }
 
     @Override
     public List<UserVO> findUserByName(String name) {
         List<User> userList = userDomainService.findUserByName(name);
         // TODO 调用Client的方法后处理在线状态
-        return null;
+        if (CollectionUtil.isEmpty(userList)) {
+            return Collections.emptyList();
+        }
+        List<Long> userIds = userList.stream().map(User::getId).toList();
+        List<Long> onlineUserIds = client.getOnlineUserList(userIds);
+        return userList.stream().map(user -> {
+            UserVO vo = BeanUtils.copyProperties(user, UserVO.class);
+            vo.setOnline(onlineUserIds.contains(user.getId()));
+            return vo;
+        }).toList();
     }
 
     @Override
     public List<OnlineTerminalVO> getOnlineTerminals(String userIds) {
-        //TODO 调用IMClient的方法来获取终端数据
-        return null;
+        List<Long> userIdList = Arrays.stream(userIds.split(",")).map(Long::parseLong).toList();
+        Map<Long, List<TerminalType>> terminalMap = client.getOnlineTerminal(userIdList);
+        return terminalMap.entrySet().stream().map(e -> new OnlineTerminalVO(
+                e.getKey(),
+                e.getValue().stream().map(TerminalType::getCode).toList()
+        )).toList();
     }
 }

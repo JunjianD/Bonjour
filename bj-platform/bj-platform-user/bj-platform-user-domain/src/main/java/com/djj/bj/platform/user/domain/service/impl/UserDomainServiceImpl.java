@@ -5,11 +5,18 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.djj.bj.common.mq.event.MessageEventSenderService;
 import com.djj.bj.platform.common.exception.BJException;
+import com.djj.bj.platform.common.model.constants.PlatformConstants;
 import com.djj.bj.platform.common.model.entity.User;
 import com.djj.bj.platform.common.model.enums.HttpCode;
+import com.djj.bj.platform.user.domain.event.UserEvent;
 import com.djj.bj.platform.user.domain.repository.UserRepository;
 import com.djj.bj.platform.user.domain.service.UserDomainService;
+import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -27,6 +34,14 @@ import java.util.List;
  */
 @Service
 public class UserDomainServiceImpl extends ServiceImpl<UserRepository, User> implements UserDomainService {
+    private final Logger logger = LoggerFactory.getLogger(UserDomainServiceImpl.class);
+
+    @Value("${message.mq.event.type}")
+    private String eventType;
+
+    @Resource
+    private MessageEventSenderService messageEventSenderService;
+
     @Override
     public User getUserByUserName(String userName) {
         if (StrUtil.isEmpty(userName)) {
@@ -38,11 +53,25 @@ public class UserDomainServiceImpl extends ServiceImpl<UserRepository, User> imp
     }
 
     @Override
-    public void saveOrUpdateUser(User user) {
+    public boolean saveOrUpdateUser(User user) {
         if (user == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
         }
-        this.saveOrUpdate(user);
+        boolean result = this.saveOrUpdate(user);
+        if (result) {
+            //TODO 发布更新缓存事件
+            logger.info("UserDomainServiceImpl.saveOrUpdateUser|用户信息更新成功, userId:{}", user.getId());
+            UserEvent userEvent = new UserEvent(user.getId(), user.getUserName(), this.getTopicEvent());
+            messageEventSenderService.send(userEvent);
+            logger.info("UserDomainServiceImpl.saveOrUpdateUser|用户事件已经发布, userId:{}", user.getId());
+        }
+        return result;
+    }
+
+    private String getTopicEvent() {
+        return PlatformConstants.EVENT_PUBLISH_TYPE_ROCKETMQ.equals(eventType) ?
+                PlatformConstants.TOPIC_EVENT_ROCKETMQ_USER :
+                PlatformConstants.TOPIC_EVENT_LOCAL;
     }
 
     @Override
