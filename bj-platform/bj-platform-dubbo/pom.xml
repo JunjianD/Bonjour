@@ -5,26 +5,24 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.djj</groupId>
-        <artifactId>Bonjour</artifactId>
+        <artifactId>bj-platform</artifactId>
         <version>1.0</version>
     </parent>
 
-    <artifactId>bj-common</artifactId>
+    <artifactId>bj-platform-dubbo</artifactId>
 
     <properties>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-spring-boot-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
+            <groupId>com.djj</groupId>
+            <artifactId>bj-platform-common</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
+
 </project>
