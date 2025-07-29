@@ -2,7 +2,6 @@ package com.djj.bj.platform.common.session;
 
 import com.djj.bj.platform.common.model.constants.PlatformConstants;
 import jakarta.servlet.http.HttpServletRequest;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
