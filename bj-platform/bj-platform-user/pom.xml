@@ -29,7 +29,7 @@
     <dependencies>
         <dependency>
             <groupId>com.djj</groupId>
-            <artifactId>bj-platform-common</artifactId>
+            <artifactId>bj-platform-dubbo</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>
