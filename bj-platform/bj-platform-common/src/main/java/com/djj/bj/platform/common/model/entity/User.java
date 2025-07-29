@@ -27,16 +27,15 @@ import java.util.Date;
 @Getter
 @TableName(value = "bj_user")
 public class User extends Model<User> {
-
     @Serial
-    private static final long serialVersionUID = 1205488643089491562L;
+    private static final long serialVersionUID = -1636343043204982321L;
 
     /**
-     * id
+     * userId
      */
     @TableId(value = "id")
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private Long userId;
 
     /**
      * 登录用户名
@@ -72,7 +71,7 @@ public class User extends Model<User> {
      * 用户类型 1:普通用户 2: 超管
      */
     @TableField(value = "type")
-    private Integer type;
+    private Integer userType;
 
     /**
      * 个性签名
@@ -100,6 +99,6 @@ public class User extends Model<User> {
 
     @Override
     public Serializable pkVal() {
-        return this.id;
+        return this.userId;
     }
 }
