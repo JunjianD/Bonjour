@@ -59,12 +59,17 @@ public class PlatformConstants {
     /**
      * 更新用户分布式缓存时用的锁前缀
      */
-    public static final String IM_USER_UPDATE_CACHE_LOCK_KEY = "IM_USER_UPDATE_CACHE_LOCK_KEY_";
+    public static final String USER_UPDATE_CACHE_LOCK_KEY = "USER_UPDATE_CACHE_LOCK_KEY_";
 
     /**
      * 用户事件消费分组
      */
     public static final String EVENT_USER_CONSUMER_GROUP = "event_user_consumer_group";
+
+    /**
+     * 默认Dubbo版本
+     */
+    public static final String DEFAULT_DUBBO_VERSION = "1.0.0";
 
     public static String getKey(String prefix, String key) {
         return prefix.concat(key);
