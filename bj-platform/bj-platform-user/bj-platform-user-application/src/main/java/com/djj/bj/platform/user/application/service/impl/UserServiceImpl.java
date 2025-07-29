@@ -68,14 +68,7 @@ public class UserServiceImpl implements UserService {
         if (dto == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
         }
-        User user = distributeCacheService.queryWithPassThrough(
-                PlatformConstants.PLATFORM_REDIS_USER_KEY,
-                dto.getUserName(),
-                User.class,
-                userDomainService::getUserByUserName,
-                PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME,
-                TimeUnit.MINUTES
-        );
+        User user = this.getUserByName(dto.getUserName());
         if (user == null) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "当前用户不存在");
         }
@@ -83,17 +76,17 @@ public class UserServiceImpl implements UserService {
             throw new BJException(HttpCode.PASSWORD_ERROR, "用户名或密码错误");
         }
         UserSession userSession = BeanUtils.copyProperties(user, UserSession.class);
-        userSession.setUserId(user.getId());
+        userSession.setUserId(user.getUserId());
         userSession.setTerminalType(dto.getTerminal());
         String strJson = JSON.toJSONString(userSession);
         String accessToken = JwtUtils.sign(
-                user.getId(),
+                user.getUserId(),
                 strJson,
                 jwtProperties.getAccessTokenExpireIn(),
                 jwtProperties.getAccessTokenSecret()
         );
         String refreshToken = JwtUtils.sign(
-                user.getId(),
+                user.getUserId(),
                 strJson,
                 jwtProperties.getRefreshTokenExpireIn(),
                 jwtProperties.getRefreshTokenSecret()
@@ -111,23 +104,16 @@ public class UserServiceImpl implements UserService {
         if (dto == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
         }
-        User user = distributeCacheService.queryWithPassThrough(
-                PlatformConstants.PLATFORM_REDIS_USER_KEY,
-                dto.getUserName(),
-                User.class,
-                userDomainService::getUserByUserName,
-                PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME,
-                TimeUnit.MINUTES
-        );
+        User user = this.getUserByName(dto.getUserName());
         if (user != null) {
             throw new BJException(HttpCode.USERNAME_ALREADY_REGISTER);
         }
         user = BeanUtils.copyProperties(dto, User.class);
-        user.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
+        user.setUserId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
         user.setCreatedTime(new Date());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         userDomainService.saveOrUpdateUser(user);
-        logger.info("用户注册成功，用户id:{},用户名:{},昵称:{}", user.getId(), dto.getUserName(), dto.getNickName());
+        logger.info("用户注册成功，用户id:{},用户名:{},昵称:{}", user.getUserId(), dto.getUserName(), dto.getNickName());
     }
 
     @Override
@@ -163,19 +149,12 @@ public class UserServiceImpl implements UserService {
         }
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userDomainService.saveOrUpdateUser(user);
-        logger.info("用户修改密码，用户id:{},用户名:{},昵称:{}", user.getId(), user.getUserName(), user.getNickName());
+        logger.info("用户修改密码，用户id:{},用户名:{},昵称:{}", user.getUserId(), user.getUserName(), user.getNickName());
     }
 
     @Override
     public User findUserByUserName(String username) {
-        User user = distributeCacheService.queryWithPassThrough(
-                PlatformConstants.PLATFORM_REDIS_USER_KEY,
-                username,
-                User.class,
-                userDomainService::getUserByUserName,
-                PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME,
-                TimeUnit.MINUTES
-        );
+        User user = this.getUserByName(username);
         if (user == null) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "当前用户不存在");
         }
@@ -223,14 +202,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO findUserById(Long id, boolean constantsOnlineFlag) {
-        User user = distributeCacheService.queryWithPassThrough(
-                PlatformConstants.PLATFORM_REDIS_USER_KEY,
-                id,
-                User.class,
-                userDomainService::getById,
-                PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME,
-                TimeUnit.MINUTES
-        );
+        User user = this.getUserById(id);
         if (user == null) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "用户不存在");
         }
@@ -238,7 +210,7 @@ public class UserServiceImpl implements UserService {
         if (constantsOnlineFlag) {
             vo.setOnline(client.isOnline(id));
         }
-        return null;
+        return vo;
     }
 
     @Override
@@ -254,17 +226,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByName(String userName) {
+        return distributeCacheService.queryWithPassThrough(
+                PlatformConstants.PLATFORM_REDIS_USER_KEY,
+                userName,
+                User.class,
+                userDomainService::getUserByUserName,
+                PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME,
+                TimeUnit.MINUTES
+        );
+    }
+
+
+    @Override
     public List<UserVO> findUserByName(String name) {
         List<User> userList = userDomainService.findUserByName(name);
         // TODO 调用Client的方法后处理在线状态
         if (CollectionUtil.isEmpty(userList)) {
             return Collections.emptyList();
         }
-        List<Long> userIds = userList.stream().map(User::getId).toList();
+        List<Long> userIds = userList.stream().map(User::getUserId).toList();
         List<Long> onlineUserIds = client.getOnlineUserList(userIds);
         return userList.stream().map(user -> {
             UserVO vo = BeanUtils.copyProperties(user, UserVO.class);
-            vo.setOnline(onlineUserIds.contains(user.getId()));
+            vo.setOnline(onlineUserIds.contains(user.getUserId()));
             return vo;
         }).toList();
     }
