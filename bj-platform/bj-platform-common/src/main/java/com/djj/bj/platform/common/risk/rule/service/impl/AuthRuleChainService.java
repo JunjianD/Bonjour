@@ -42,7 +42,6 @@ public class AuthRuleChainService extends BaseRuleChainService {
         }
         UserSession userSession = this.getUserSession(request);
         if (userSession == null) {
-            logger.error("AuthRuleChainService|未登录，url|{}", request.getRequestURI());
             throw new BJException(HttpCode.NO_LOGIN);
         }
         request.setAttribute(PlatformConstants.SESSION, userSession);
