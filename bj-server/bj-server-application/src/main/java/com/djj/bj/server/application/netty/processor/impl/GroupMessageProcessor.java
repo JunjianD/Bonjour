@@ -1,7 +1,5 @@
 package com.djj.bj.server.application.netty.processor.impl;
 
-import com.djj.bj.server.application.netty.cache.UserChannelCtxCache;
-import com.djj.bj.server.application.netty.processor.MessageProcessor;
 import com.djj.bj.common.io.constants.Constants;
 import com.djj.bj.common.io.enums.ResponseType;
 import com.djj.bj.common.io.enums.SystemInfoType;
@@ -10,11 +8,14 @@ import com.djj.bj.common.io.model.SendMessage;
 import com.djj.bj.common.io.model.SendResult;
 import com.djj.bj.common.io.model.UserInfo;
 import com.djj.bj.common.mq.MessageSenderService;
+import com.djj.bj.server.application.netty.cache.UserChannelCtxCache;
+import com.djj.bj.server.application.netty.processor.MessageProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ import java.util.List;
  * @className GroupMessageProcessor
  * @date 2025/7/7 22:52
  */
+@Component
 public class GroupMessageProcessor implements MessageProcessor<ReceiveMessage> {
     private final Logger logger = LoggerFactory.getLogger(PrivateMessageProcessor.class);
 
