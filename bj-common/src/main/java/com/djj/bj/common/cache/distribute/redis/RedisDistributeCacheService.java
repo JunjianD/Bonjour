@@ -87,6 +87,31 @@ public class RedisDistributeCacheService implements DistributeCacheService {
     }
 
     @Override
+    public Long addSet(String key, String... values) {
+        return stringRedisTemplate.opsForSet().add(key, this.getValue(values));
+    }
+
+    @Override
+    public Boolean isMemberSet(String key, Object value) {
+        return stringRedisTemplate.opsForSet().isMember(key, this.getValue(value));
+    }
+
+    @Override
+    public Set<String> membersSet(String key) {
+        return stringRedisTemplate.opsForSet().members(key);
+    }
+
+    @Override
+    public Long removeSet(String key, Object... values) {
+        return stringRedisTemplate.opsForSet().remove(key, this.getValue(values));
+    }
+
+    @Override
+    public Long sizeSet(String key) {
+        return stringRedisTemplate.opsForSet().size(key);
+    }
+
+    @Override
     public void setWithLogicalExpire(String key, Object value, Long timeout, TimeUnit timeUnit) {
         RedisData redisData = new RedisData(value, LocalDateTime.now().plusSeconds(timeUnit.toSeconds(timeout)));
         stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(redisData));

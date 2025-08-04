@@ -47,7 +47,7 @@ public class GroupVO {
 
     @Length(max = 20, message = "用户显示的群昵称不能大于20")
     @Schema(description = "用户显示的群昵称")
-    private String groupNickName;
+    private String aliasName;
 
     @Length(max = 20, message = "群聊备注不能大于20")
     @Schema(description = "群聊备注")

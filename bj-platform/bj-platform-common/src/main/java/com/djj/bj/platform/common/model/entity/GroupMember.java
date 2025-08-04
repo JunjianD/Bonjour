@@ -65,7 +65,7 @@ public class GroupMember extends Model<GroupMember> {
     private String headImage;
 
     /**
-     * 备注
+     * 群聊备注
      */
     @TableField(value = "remark")
     private String remark;
