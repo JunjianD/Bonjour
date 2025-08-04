@@ -7,6 +7,7 @@ import com.djj.bj.common.cache.distribute.DistributeCacheService;
 import com.djj.bj.common.cache.id.SnowFlakeFactory;
 import com.djj.bj.common.io.enums.TerminalType;
 import com.djj.bj.common.io.jwt.JwtUtils;
+import com.djj.bj.common.mq.MessageSenderService;
 import com.djj.bj.platform.common.exception.BJException;
 import com.djj.bj.platform.common.jwt.JwtProperties;
 import com.djj.bj.platform.common.model.constants.PlatformConstants;
@@ -15,6 +16,8 @@ import com.djj.bj.platform.common.model.dto.ModifyPwdDTO;
 import com.djj.bj.platform.common.model.dto.RegisterDTO;
 import com.djj.bj.platform.common.model.entity.User;
 import com.djj.bj.platform.common.model.enums.HttpCode;
+import com.djj.bj.platform.common.model.event.User2FriendEvent;
+import com.djj.bj.platform.common.model.event.User2GroupEvent;
 import com.djj.bj.platform.common.model.vo.LoginVO;
 import com.djj.bj.platform.common.model.vo.OnlineTerminalVO;
 import com.djj.bj.platform.common.model.vo.UserVO;
@@ -63,8 +66,11 @@ public class UserServiceImpl implements UserService {
     @Resource
     private Client client;
 
+    @Resource
+    private MessageSenderService messageSenderService;
+
     @Override
-    public LoginVO login(LoginDTO dto) {
+    public LoginVO login(LoginDTO dto) { //TODO 登录不更新缓存，明天debug
         if (dto == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
         }
@@ -172,15 +178,6 @@ public class UserServiceImpl implements UserService {
         if (Objects.isNull(user)) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "用户不存在");
         }
-        // 如果用户更新了昵称和头像，则更新好友昵称和头像
-        if (!user.getNickName().equals(vo.getNickName()) || !user.getHeadImageThumb().equals(vo.getHeadImageThumb())) {
-            //TODO 后续完善
-        }
-        // 如果用户更新了昵称和头像，则更新群聊中的头像
-        if (!user.getNickName().equals(vo.getNickName()) || !user.getHeadImageThumb().equals(vo.getHeadImageThumb())) {
-            //TODO 后续完善
-        }
-
         // 更新用户的基本信息
         if (!StrUtil.isEmpty(vo.getNickName())) {
             user.setNickName(vo.getNickName());
@@ -197,7 +194,22 @@ public class UserServiceImpl implements UserService {
         if (!StrUtil.isEmpty(vo.getHeadImageThumb())) {
             user.setHeadImageThumb(vo.getHeadImageThumb());
         }
-        userDomainService.saveOrUpdateUser(user);
+        boolean result = userDomainService.saveOrUpdateUser(user);
+        if (!result) {
+            return;
+        }
+        // 如果用户更新了昵称和头像，则更新好友昵称和头像
+        if (!user.getNickName().equals(vo.getNickName()) || !user.getHeadImageThumb().equals(vo.getHeadImageThumb())) {
+            //TODO 后续完善
+            User2FriendEvent user2FriendEvent = new User2FriendEvent(session.getUserId(), vo.getNickName(), vo.getHeadImageThumb(), PlatformConstants.TOPIC_USER_TO_FRIEND);
+            messageSenderService.send(user2FriendEvent);
+        }
+        // 如果用户更新了昵称和头像，则更新群聊中的头像
+        if (!user.getNickName().equals(vo.getNickName()) || !user.getHeadImageThumb().equals(vo.getHeadImageThumb())) {
+            //TODO 后续完善
+            User2GroupEvent user2GroupEvent = new User2GroupEvent(session.getUserId(), vo.getHeadImageThumb(), PlatformConstants.TOPIC_USER_TO_GROUP);
+            messageSenderService.send(user2GroupEvent);
+        }
     }
 
     @Override

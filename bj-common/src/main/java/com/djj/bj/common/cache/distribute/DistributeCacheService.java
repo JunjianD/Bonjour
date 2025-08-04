@@ -6,10 +6,10 @@ import cn.hutool.crypto.digest.MD5;
 import cn.hutool.json.JSONUtil;
 import com.djj.bj.common.cache.distribute.conversion.TypeConversion;
 
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -27,7 +27,7 @@ public interface DistributeCacheService {
     /**
      * 永久缓存
      *
-     * @param key 缓存的key
+     * @param key   缓存的key
      * @param value 缓存的value
      */
     void set(String key, Object value);
@@ -35,8 +35,8 @@ public interface DistributeCacheService {
     /**
      * 设置缓存过期
      *
-     * @param key 缓存的key
-     * @param timeout 过期时长
+     * @param key      缓存的key
+     * @param timeout  过期时长
      * @param timeUnit 时间单位
      * @return 设置过期时间，返回是否成功
      */
@@ -45,19 +45,61 @@ public interface DistributeCacheService {
     /**
      * 将数据缓存一段时间，失效自动删除
      *
-     * @param key 缓存的key
-     * @param value 缓存的value
-     * @param timeout 物理缓存的时长
+     * @param key      缓存的key
+     * @param value    缓存的value
+     * @param timeout  物理缓存的时长
      * @param timeUnit 时间单位
      */
     void set(String key, Object value, Long timeout, TimeUnit timeUnit);
 
     /**
-     * 保存缓存时设置逻辑过期时间，自行判断是否失效
+     * 向set中添加元素
+     *
+     * @param key    缓存的key
+     * @param values 缓存的value集合
+     * @return 添加成功的元素数量
+     */
+    Long addSet(String key, String... values);
+
+    /**
+     * 检测Value是否是key set中的成员
+     *
+     * @param key   缓存的key
+     * @param value 要检测的成员
+     * @return 是否是成员
+     */
+    Boolean isMemberSet(String key, Object value);
+
+    /**
+     * 获取指定的Set集合下的所有元素
      *
      * @param key 缓存的key
-     * @param value 缓存的value
-     * @param timeout 缓存逻辑过期时长
+     * @return 当前key下的所有元素
+     */
+    Set<String> membersSet(String key);
+
+    /**
+     * 移除Set集合中的元素
+     *
+     * @param key    缓存的key
+     * @param values 要移除的value
+     */
+    Long removeSet(String key, Object... values);
+
+    /**
+     * 获取Set集合中的大小
+     *
+     * @param key 缓存的key
+     * @return Set集合大小
+     */
+    Long sizeSet(String key);
+
+    /**
+     * 保存缓存时设置逻辑过期时间，自行判断是否失效
+     *
+     * @param key      缓存的key
+     * @param value    缓存的value
+     * @param timeout  缓存逻辑过期时长
      * @param timeUnit 缓存逻辑时间单位
      */
     void setWithLogicalExpire(String key, Object value, Long timeout, TimeUnit timeUnit);
@@ -107,21 +149,21 @@ public interface DistributeCacheService {
     /**
      * 查询缓存，如果缓存不存在则通过dbFallback函数从数据库获取数据，并将结果缓存，防止缓存穿透
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param id 缓存的业务标识，通常是数据库主键
-     * @param clazz 缓存的值的类型
+     * @param keyPrefix  缓存key的前缀
+     * @param id         缓存的业务标识，通常是数据库主键
+     * @param clazz      缓存的值的类型
      * @param dbFallback 查询数据库的Function函数，接收id参数并返回查询结果
-     * @param timeout 缓存的过期时间
-     * @param timeUnit 缓存的过期时间单位
+     * @param timeout    缓存的过期时间
+     * @param timeUnit   缓存的过期时间单位
+     * @param <T>        缓存的值的泛型
+     * @param <ID>       查询数据库参数的泛型，也是参数泛型类型
      * @return 查询到的对象，如果缓存不存在则通过dbFallback函数从数据库获取数据并缓存
-     * @param <T> 缓存的值的泛型
-     * @param <ID> 查询数据库参数的泛型，也是参数泛型类型
      */
-    <T,ID> T queryWithPassThrough(
+    <T, ID> T queryWithPassThrough(
             String keyPrefix,
             ID id,
             Class<T> clazz,
-            Function<ID,T> dbFallback,
+            Function<ID, T> dbFallback,
             Long timeout,
             TimeUnit timeUnit
     );
@@ -129,13 +171,13 @@ public interface DistributeCacheService {
     /**
      * 不带参数查询对象和简单类型数据，防止缓存穿透
      *
-     * @param keyPrefix key的前缀
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  key的前缀
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 无参数查询数据库数据
-     * @param timeout 缓存的时长
-     * @param timeUnit 时间单位
+     * @param timeout    缓存的时长
+     * @param timeUnit   时间单位
+     * @param <T>        结果泛型
      * @return 返回业务数据
-     * @param <T> 结果泛型
      */
     <T> T queryWithPassThroughWithoutArgs(
             String keyPrefix,
@@ -148,21 +190,21 @@ public interface DistributeCacheService {
     /**
      * 带参数查询集合数据，防止缓存穿透
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param id 缓存的业务标识，通常是数据库主键
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param id         缓存的业务标识，通常是数据库主键
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 查询数据库的Function函数，接收id参数并返回查询结果
-     * @param timeout 缓存的时长
-     * @param timeUnit 时间单位
+     * @param timeout    缓存的时长
+     * @param timeUnit   时间单位
+     * @param <T>        结果泛型
+     * @param <ID>       查询数据库参数泛型，也是参数泛型类型
      * @return 返回业务数据
-     * @param <T> 结果泛型
-     * @param <ID> 查询数据库参数泛型，也是参数泛型类型
      */
-    <T,ID> List<T> queryWithPassThroughList(
+    <T, ID> List<T> queryWithPassThroughList(
             String keyPrefix,
             ID id,
             Class<T> clazz,
-            Function<ID,List<T>> dbFallback,
+            Function<ID, List<T>> dbFallback,
             Long timeout,
             TimeUnit timeUnit
     );
@@ -170,13 +212,13 @@ public interface DistributeCacheService {
     /**
      * 不带参数查询集合数据，防止缓存穿透
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 无参数查询数据库数据
-     * @param timeout 缓存的时长
-     * @param timeUnit 时间单位
+     * @param timeout    缓存的时长
+     * @param timeUnit   时间单位
+     * @param <T>        结果泛型
      * @return 返回业务数据
-     * @param <T> 结果泛型
      */
     <T> List<T> queryWithPassThroughListWithoutArgs(
             String keyPrefix,
@@ -189,21 +231,21 @@ public interface DistributeCacheService {
     /**
      * 带参数查询数据，按照逻辑过期时间读取缓存数据，新开线程重建缓存，其他线程直接返回逻辑过期数据，不占用资源
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param id 缓存业务标识，也是查询数据库的参数
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param id         缓存业务标识，也是查询数据库的参数
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 查询数据库的Function函数，接收id参数并返回查询结果
-     * @param timeout 缓存逻辑过期时长
-     * @param timeUnit 缓存逻辑过期时间单位
+     * @param timeout    缓存逻辑过期时长
+     * @param timeUnit   缓存逻辑过期时间单位
+     * @param <T>        结果泛型
+     * @param <ID>       查询数据库参数泛型，也是参数泛型类型
      * @return 业务数据
-     * @param <T> 结果泛型
-     * @param <ID> 查询数据库参数泛型，也是参数泛型类型
      */
-    <T,ID> T queryWithLogicalExpire(
+    <T, ID> T queryWithLogicalExpire(
             String keyPrefix,
             ID id,
             Class<T> clazz,
-            Function<ID,T> dbFallback,
+            Function<ID, T> dbFallback,
             Long timeout,
             TimeUnit timeUnit
     );
@@ -211,13 +253,13 @@ public interface DistributeCacheService {
     /**
      * 不带参数查询数据，按照逻辑过期时间读取缓存数据，新开线程重建缓存，其他线程直接返回逻辑过期数据，不占用资源
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 无参数查询数据库数据
-     * @param timeout 缓存的时长
-     * @param timeUnit 时间单位
+     * @param timeout    缓存的时长
+     * @param timeUnit   时间单位
+     * @param <T>        结果泛型
      * @return 返回业务数据
-     * @param <T> 结果泛型
      */
     <T> T queryWithLogicalExpireWithoutArgs(
             String keyPrefix,
@@ -230,21 +272,21 @@ public interface DistributeCacheService {
     /**
      * 带参数查询集合数据，按照逻辑过期时间读取缓存数据，新开线程重建缓存，其他线程直接返回逻辑过期数据，不占用资源
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param id 缓存业务标识，也是查询数据库的参数
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param id         缓存业务标识，也是查询数据库的参数
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 查询数据库的Function函数，接收id参数并返回查询结果
-     * @param timeout 缓存逻辑过期时长
-     * @param timeUnit 缓存逻辑过期时间单位
+     * @param timeout    缓存逻辑过期时长
+     * @param timeUnit   缓存逻辑过期时间单位
+     * @param <T>        结果泛型
+     * @param <ID>       查询数据库参数泛型，也是参数泛型类型
      * @return 业务数据
-     * @param <T> 结果泛型
-     * @param <ID> 查询数据库参数泛型，也是参数泛型类型
      */
-    <T,ID> List<T> queryWithLogicalExpireList(
+    <T, ID> List<T> queryWithLogicalExpireList(
             String keyPrefix,
             ID id,
             Class<T> clazz,
-            Function<ID,List<T>> dbFallback,
+            Function<ID, List<T>> dbFallback,
             Long timeout,
             TimeUnit timeUnit
     );
@@ -252,13 +294,13 @@ public interface DistributeCacheService {
     /**
      * 不带参数查询集合数据，按照逻辑过期时间读取缓存数据，新开线程重建缓存，其他线程直接返回逻辑过期数据，不占用资源
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 无参数查询数据库数据
-     * @param timeout 缓存的时长
-     * @param timeUnit 时间单位
+     * @param timeout    缓存的时长
+     * @param timeUnit   时间单位
+     * @param <T>        结果泛型
      * @return 返回业务数据
-     * @param <T> 结果泛型
      */
     <T> List<T> queryWithLogicalExpireListWithoutArgs(
             String keyPrefix,
@@ -271,21 +313,21 @@ public interface DistributeCacheService {
     /**
      * 带参数查询数据，按照互斥锁方式获取缓存数据，同一时刻只有一个线程访问数据库，其他线程访问不到数据重试
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param id 缓存业务标识，也是查询数据库的参数
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param id         缓存业务标识，也是查询数据库的参数
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 查询数据库的Function函数，接收id参数并返回查询结果
-     * @param timeout 缓存时长
-     * @param timeUnit 时间单位
+     * @param timeout    缓存时长
+     * @param timeUnit   时间单位
+     * @param <T>        缓存的值的泛型
+     * @param <ID>       查询数据库参数的泛型，也是参数泛型类型
      * @return 查询到的对象，���果缓存不存在则通过dbFallback函数从数据库获取数据并缓存
-     * @param <T> 缓存的值的泛型
-     * @param <ID> 查询数据库参数的泛型，也是参数泛型类型
      */
-    <T,ID> T queryWithMutex(
+    <T, ID> T queryWithMutex(
             String keyPrefix,
             ID id,
             Class<T> clazz,
-            Function<ID,T> dbFallback,
+            Function<ID, T> dbFallback,
             Long timeout,
             TimeUnit timeUnit
     );
@@ -293,13 +335,13 @@ public interface DistributeCacheService {
     /**
      * 不带参数查询数据，按照互斥锁方式获取缓存数据，同一时刻只有一个线程访问数据库，其他线程访问不到数据重试
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 无参数查询数据库数据
-     * @param timeout 缓存时长
-     * @param timeUnit 时间单位
+     * @param timeout    缓存时长
+     * @param timeUnit   时间单位
+     * @param <T>        缓存的值的泛型
      * @return 查询到的对象，如果缓存不存在则通过dbFallback函数从数据库获取数据并缓存
-     * @param <T> 缓存的值的泛型
      */
     <T> T queryWithMutexWithoutArgs(
             String keyPrefix,
@@ -312,21 +354,21 @@ public interface DistributeCacheService {
     /**
      * 带参数查询集合数据，按照互斥锁方式获取缓存数据，同一时刻只有一个线程访问数据库，其他线程访问不到数据重试
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param id 缓存业务标识，也是查询数据库的参数
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param id         缓存业务标识，也是查询数据库的参数
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 查询数据库的Function函数，接收id参数并返回查询结果
-     * @param timeout 缓存时长
-     * @param timeUnit 时间单位
+     * @param timeout    缓存时长
+     * @param timeUnit   时间单位
+     * @param <T>        缓存的值的泛型
+     * @param <ID>       查询数据库参数的泛型，也是参数泛型类型
      * @return 查询到的对象，如果缓存不存在则通过dbFallback函数从数据库获取数据并缓存
-     * @param <T> 缓存的值的泛型
-     * @param <ID> 查询数据库参数的泛型，也是参数泛型类型
      */
-    <T,ID> List<T> queryWithMutexList(
+    <T, ID> List<T> queryWithMutexList(
             String keyPrefix,
             ID id,
             Class<T> clazz,
-            Function<ID,List<T>> dbFallback,
+            Function<ID, List<T>> dbFallback,
             Long timeout,
             TimeUnit timeUnit
     );
@@ -334,13 +376,13 @@ public interface DistributeCacheService {
     /**
      * 不带参数查询集合数据，按照互斥锁方式获取缓存数据，同一时刻只有一个线程访问数据库，其他线程访问不到数据重试
      *
-     * @param keyPrefix 缓存key的前缀
-     * @param clazz 缓存的实际对象类型
+     * @param keyPrefix  缓存key的前缀
+     * @param clazz      缓存的实际对象类型
      * @param dbFallback 无参数查询数据库数据
-     * @param timeout 缓存时长
-     * @param timeUnit 时间单位
+     * @param timeout    缓存时长
+     * @param timeUnit   时间单位
+     * @param <T>        缓存的值的泛型
      * @return 查询到的对象，如果缓存不存在则通过dbFallback函数从数据库获取数据并缓存
-     * @param <T> 缓存的值的泛型
      */
     <T> List<T> queryWithMutexListWithoutArgs(
             String keyPrefix,
@@ -353,16 +395,16 @@ public interface DistributeCacheService {
     /**
      * 将对象转换为指定类型的结果
      *
-     * @param obj 未知类型对象
+     * @param obj   未知类型对象
      * @param clazz 转换后的目标类型
+     * @param <T>   泛型
      * @return 转换后的泛型对象
-     * @param <T> 泛型
      */
     default <T> T getResult(Object obj, Class<T> clazz) {
         if (obj == null) {
             return null;
         }
-        if(TypeConversion.isSimpleType(obj)) {
+        if (TypeConversion.isSimpleType(obj)) {
             return Convert.convert(clazz, obj);
         }
         return JSONUtil.toBean(JSONUtil.toJsonStr(obj), clazz);
@@ -371,13 +413,13 @@ public interface DistributeCacheService {
     /**
      * 将字符串转换为指定类型的结果的List
      *
-     * @param obj 字符串对象
+     * @param obj   字符串对象
      * @param clazz 转换后的目标类型
-     * @return  泛型List集合
-     * @param <T> 泛型
+     * @param <T>   泛型
+     * @return 泛型List集合
      */
     default <T> List<T> getResultList(String obj, Class<T> clazz) {
-        if(StrUtil.isEmpty(obj)) {
+        if (StrUtil.isEmpty(obj)) {
             return null;
         }
         return JSONUtil.toList(JSONUtil.parseArray(obj), clazz);
@@ -387,23 +429,23 @@ public interface DistributeCacheService {
      * 不确定参数类型的情况下，使用MD5计算参数的拼接到Redis中的唯一Key
      *
      * @param keyPrefix 缓存key的前缀
-     * @param id 泛型参数
+     * @param id        泛型参数
+     * @param <ID>      参数泛型类型
      * @return 拼接好的缓存key
-     * @param <ID> 参数泛型类型
      */
     default <ID> String getKey(String keyPrefix, ID id) {
-        if(id == null) {
+        if (id == null) {
             return keyPrefix;
         }
 
         String key = "";
-        if(TypeConversion.isSimpleType(id)) {
+        if (TypeConversion.isSimpleType(id)) {
             key = StrUtil.toString(id);
-        }else{
+        } else {
             key = MD5.create().digestHex(JSONUtil.toJsonStr(id));
         }
 
-        if(StrUtil.isEmpty(key)) {
+        if (StrUtil.isEmpty(key)) {
             key = "";
         }
         return keyPrefix.concat(key);
@@ -415,7 +457,7 @@ public interface DistributeCacheService {
      * @param key key
      * @return 返回key
      */
-    default String getKey(String key){
+    default String getKey(String key) {
         return getKey(key, null);
     }
 
@@ -425,8 +467,8 @@ public interface DistributeCacheService {
      * @param value 要保存的value值
      * @return 返回要保存到缓存中的value字符串
      */
-    default String getValue(Object value){
-        return TypeConversion.isSimpleType(value)?
+    default String getValue(Object value) {
+        return TypeConversion.isSimpleType(value) ?
                 String.valueOf(value) :
                 JSONUtil.toJsonStr(value);
     }

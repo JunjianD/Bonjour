@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/terminal/online")
-    @Operation(summary = "获取在线终端信息", description = "查询当前用户的在线终端信息,返回在线的用户id的终端集合")
+    @Operation(summary = "获取在线终端信息", description = "查询用户的在线终端信息,返回在线的用户id的终端集合")
     @Parameters({
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string")),
     })
@@ -64,7 +65,7 @@ public class UserController {
     @Parameters({
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string")),
     })
-    public ResponseMessage<UserVO> findById(@NotEmpty @PathVariable("id") Long id) {
+    public ResponseMessage<UserVO> findById(@NotNull @PathVariable("id") Long id) {
         return ResponseMessageFactory.getSuccessResponseMessage(userService.findUserById(id, true));
     }
 

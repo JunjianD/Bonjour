@@ -46,9 +46,10 @@ public class UserCacheServiceImpl implements UserCacheService {
         }
         logger.info("UserCacheServiceImpl.updateUserCache|开始更新用户缓存，userId:{}", userId);
         // 获取分布式锁
-        DistributedLock lock = distributeLockFactory.getDistributedLock(
-                PlatformConstants.USER_UPDATE_CACHE_LOCK_KEY.concat(userId.toString())
-        );
+        DistributedLock lock = distributeLockFactory.getDistributedLock(PlatformConstants.getKey(
+                PlatformConstants.USER_UPDATE_CACHE_LOCK_KEY,
+                userId.toString()
+        ));
         try {
             boolean isSuccess = lock.tryLock();
             if (!isSuccess) {

@@ -17,9 +17,105 @@ public class PlatformConstants {
     public static final Long DEFAULT_REDIS_CACHE_EXPIRE_TIME = 10L;
 
     /**
+     * 绑定好友
+     */
+    public static final String FRIEND_HANDLER_BIND = "bind";
+
+    /**
+     * 解除绑定
+     */
+    public static final String FRIEND_HANDLER_UNBIND = "unbind";
+
+    /**
+     * 更新好友信息
+     */
+    public static final String FRIEND_HANDLER_UPDATE = "update";
+
+    /**
+     * 创建群聊
+     */
+    public static final String GROUP_HANDLER_CREATE = "create";
+
+    /**
+     * 修改群聊
+     */
+    public static final String GROUP_HANDLER_MODIFY = "modify";
+
+    /**
+     * 删除群聊
+     */
+    public static final String GROUP_HANDLER_DELETE = "delete";
+
+    /**
+     * 退群
+     */
+    public static final String GROUP_HANDLER_QUIT = "quit";
+
+    /**
+     * 踢人
+     */
+    public static final String GROUP_HANDLER_KICK = "kick";
+
+    /**
+     * 邀请人进群
+     */
+    public static final String GROUP_HANDLER_INVITE = "invite";
+
+
+    /**
      * 大后端平台的用户key
      */
     public static final String PLATFORM_REDIS_USER_KEY = "platform:user:";
+
+    /**
+     * 大后端平台的好友key
+     */
+    public static final String PLATFORM_REDIS_FRIEND_SINGLE_KEY = "platform:friend:single:";
+
+    /**
+     * 好友列表
+     */
+    public static final String PLATFORM_REDIS_FRIEND_LIST_KEY = "platform:friend:list:";
+
+    /**
+     * 是否是好友关系
+     */
+    public static final String PLATFORM_REDIS_FRIEND_SET_KEY = "platform:friend:set:";
+
+    /**
+     * 单个群组
+     */
+    public static final String PLATFORM_REDIS_GROUP_SINGLE_KEY = "platform:group:single:";
+
+    /**
+     * 群组列表
+     */
+    public static final String PLATFORM_REDIS_GROUP_LIST_KEY = "platform:group:list:";
+
+    /**
+     * 单个群组vo
+     */
+    public static final String PLATFORM_REDIS_GROUP_VO_SINGLE_KEY = "platform:group:vo:single:";
+
+    /**
+     * 群成员列表
+     */
+    public static final String PLATFORM_REDIS_MEMBER_VO_LIST_KEY = "platform:member:vo:list:";
+
+    /**
+     * 群成员vo
+     */
+    public static final String PLATFORM_REDIS_MEMBER_VO_SIMPLE_KEY = "platform:member:simple:vo:";
+
+    /**
+     * simple vo list
+     */
+    public static final String PLATFORM_REDIS_MEMBER_LIST_SIMPLE_KEY = "platform:member:simple:list:";
+
+    /**
+     * 群成员id列表
+     */
+    public static final String PLATFORM_REDIS_MEMBER_ID_KEY = "platform:member:id:list:";
 
     /**
      * Session数据
@@ -52,9 +148,39 @@ public class PlatformConstants {
     public static final String TOPIC_EVENT_ROCKETMQ_USER = "topic_event_rocketmq_user";
 
     /**
+     * 好友事件TOPIC
+     */
+    public static final String TOPIC_EVENT_ROCKETMQ_FRIEND = "topic_event_rocketmq_friend";
+
+    /**
+     * 群组事件Topic
+     */
+    public static final String TOPIC_EVENT_ROCKETMQ_GROUP = "topic_event_rocketmq_group";
+
+    /**
      * 本地订阅事件
      */
     public static final String TOPIC_EVENT_LOCAL = "topic_event_local";
+
+    /**
+     * 更新用户信息异步更新好友表数据
+     */
+    public static final String TOPIC_USER_TO_FRIEND = "topic_user_to_friend";
+
+    /**
+     * 更新用户信息异步更新群组表数据
+     */
+    public static final String TOPIC_USER_TO_GROUP = "topic_user_to_group";
+
+    /**
+     * 消费者分组
+     */
+    public static final String TOPIC_USER_TO_FRIEND_GROUP = "topic_user_to_friend_group";
+
+    /**
+     * 消费者分组
+     */
+    public static final String TOPIC_USER_TO_GROUP_GROUP = "topic_user_to_group_group";
 
     /**
      * 更新用户分布式缓存时用的锁前缀
@@ -62,9 +188,24 @@ public class PlatformConstants {
     public static final String USER_UPDATE_CACHE_LOCK_KEY = "USER_UPDATE_CACHE_LOCK_KEY_";
 
     /**
+     * 更新好友分布式缓存时用的锁前缀
+     */
+    public static final String FRIEND_UPDATE_CACHE_LOCK_KEY = "FRIEND_UPDATE_CACHE_LOCK_KEY_";
+
+    /**
      * 用户事件消费分组
      */
     public static final String EVENT_USER_CONSUMER_GROUP = "event_user_consumer_group";
+
+    /**
+     * 好友事件消费分组
+     */
+    public static final String EVENT_FRIEND_CONSUMER_GROUP = "event_friend_consumer_group";
+
+    /**
+     * 群组事件消费分组
+     */
+    public static final String EVENT_GROUP_CONSUMER_GROUP = "event_group_consumer_group";
 
     /**
      * 默认Dubbo版本

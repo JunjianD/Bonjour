@@ -62,8 +62,10 @@ public class UserDomainServiceImpl extends ServiceImpl<UserRepository, User> imp
             //TODO 发布更新缓存事件
             logger.info("UserDomainServiceImpl.saveOrUpdateUser|用户信息更新成功, userId:{}", user.getUserId());
             UserEvent userEvent = new UserEvent(user.getUserId(), user.getUserName(), this.getTopicEvent());
-            messageEventSenderService.send(userEvent);
-            logger.info("UserDomainServiceImpl.saveOrUpdateUser|用户事件已经发布, userId:{}", user.getUserId());
+            boolean sendOk = messageEventSenderService.send(userEvent);
+            if (sendOk) {
+                logger.info("UserDomainServiceImpl.saveOrUpdateUser|用户事件已经发布, userId:{}", user.getUserId());
+            }
         }
         return result;
     }

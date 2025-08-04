@@ -59,9 +59,7 @@ public class IPRuleChainService extends BaseRuleChainService {
             windowPeriod = windowPeriod == null ? DEFAULT_WINDOWS_PERIOD : windowPeriod;
             String ip = this.getIP(request);
             boolean result = slidingWindowLimitService.passThough(ip, windowPeriod, windowsSize);
-            logger.info("IPRuleChainService | IP限制 | IP: {} | 结果: {}", ip, result);
             return result ? HttpCode.SUCCESS : HttpCode.PROGRAM_ERROR;
-
         } catch (Exception e) {
             logger.error("IPRuleChainService | IP限制异常 | {}", e.getMessage());
             return HttpCode.PROGRAM_ERROR;

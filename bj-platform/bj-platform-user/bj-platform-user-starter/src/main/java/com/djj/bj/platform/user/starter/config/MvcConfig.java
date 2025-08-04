@@ -29,7 +29,7 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(interceptor)
                 .addPathPatterns("/**") // 拦截所有请求
                 .excludePathPatterns("/login", "/logout", "/register", "/refreshToken",
-                        "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**",
+                        "/swagger-resources/**", "/webjars/**", "/swagger-ui/**",
                         "/v3/api-docs/**"); // 排除登录、注册和登出接口
     }
 
