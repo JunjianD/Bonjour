@@ -60,18 +60,13 @@ public class FriendCacheServiceImpl implements FriendCacheService {
                 return;
             }
             switch (friendEvent.getHandler()) {
-                case PlatformConstants.FRIEND_HANDLER_BIND:
-                    this.bindFriend(friendEvent);
-                    break;
-                case PlatformConstants.FRIEND_HANDLER_UNBIND:
-                    this.unbindFriend(friendEvent);
-                    break;
-                case PlatformConstants.FRIEND_HANDLER_UPDATE:
-                    this.updateFriend(friendEvent);
-                    break;
-                default:
+                case PlatformConstants.FRIEND_HANDLER_BIND -> this.bindFriend(friendEvent);
+                case PlatformConstants.FRIEND_HANDLER_UNBIND -> this.unbindFriend(friendEvent);
+                case PlatformConstants.FRIEND_HANDLER_UPDATE -> this.updateFriend(friendEvent);
+                default -> {
                     logger.info("IMFriendCacheService|更新分布式缓存时，操作类型不匹配，handler:{}, 使用默认更新", friendEvent.getHandler());
                     this.updateFriend(friendEvent);
+                }
             }
         } catch (Exception e) {
             logger.error("IMFriendCacheService|更新分布式缓存时发生异常 | {}", JSONObject.toJSONString(friendEvent));
