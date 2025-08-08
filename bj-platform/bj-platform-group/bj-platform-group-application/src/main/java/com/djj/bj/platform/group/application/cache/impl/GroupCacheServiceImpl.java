@@ -35,26 +35,14 @@ public class GroupCacheServiceImpl implements GroupCacheService {
             return;
         }
         switch (groupEvent.getHandler()) {
-            case PlatformConstants.GROUP_HANDLER_INVITE:
-                this.handlerInvite(groupEvent);
-                break;
-            case PlatformConstants.GROUP_HANDLER_KICK:
-                this.handlerKick(groupEvent);
-                break;
-            case PlatformConstants.GROUP_HANDLER_QUIT:
-                this.handlerQuit(groupEvent);
-                break;
-            case PlatformConstants.GROUP_HANDLER_DELETE:
-                this.handlerDelete(groupEvent);
-                break;
-            case PlatformConstants.GROUP_HANDLER_MODIFY:
-                this.handlerModify(groupEvent);
-                break;
-            case PlatformConstants.GROUP_HANDLER_CREATE:
-                this.handlerCreate(groupEvent);
-                break;
-            default:
-                logger.info("GroupCacheServiceImpl.updateGroupCache | 不存在此类事件 | 群组缓存服务接收到的事件参数为|{}", JSONObject.toJSONString(groupEvent));
+            case PlatformConstants.GROUP_HANDLER_INVITE -> this.handlerInvite(groupEvent);
+            case PlatformConstants.GROUP_HANDLER_KICK -> this.handlerKick(groupEvent);
+            case PlatformConstants.GROUP_HANDLER_QUIT -> this.handlerQuit(groupEvent);
+            case PlatformConstants.GROUP_HANDLER_DELETE -> this.handlerDelete(groupEvent);
+            case PlatformConstants.GROUP_HANDLER_MODIFY -> this.handlerModify(groupEvent);
+            case PlatformConstants.GROUP_HANDLER_CREATE -> this.handlerCreate(groupEvent);
+            default ->
+                    logger.info("GroupCacheServiceImpl.updateGroupCache | 不存在此类事件 | 群组缓存服务接收到的事件参数为|{}", JSONObject.toJSONString(groupEvent));
         }
     }
 
