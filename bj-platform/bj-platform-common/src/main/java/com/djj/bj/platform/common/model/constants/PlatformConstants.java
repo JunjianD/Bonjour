@@ -183,6 +183,26 @@ public class PlatformConstants {
     public static final String TOPIC_USER_TO_GROUP_GROUP = "topic_user_to_group_group";
 
     /**
+     * 保存私聊消息分组
+     */
+    public static final String TOPIC_PRIVATE_TX_MESSAGE_GROUP = "topic_private_message_save_group";
+
+    /**
+     * 群聊事务消息分组
+     */
+    public static final String TOPIC_GROUP_TX_MESSAGE_GROUP = "topic_group_tx_message_group";
+
+    /**
+     * 私聊消息Topic
+     */
+    public static final String TOPIC_PRIVATE_TX_MESSAGE = "topic_private_message_save";
+
+    /**
+     * 群聊消息topic
+     */
+    public static final String TOPIC_GROUP_TX_MESSAGE = "topic_group_tx_message";
+
+    /**
      * 更新用户分布式缓存时用的锁前缀
      */
     public static final String USER_UPDATE_CACHE_LOCK_KEY = "USER_UPDATE_CACHE_LOCK_KEY_";
@@ -206,6 +226,45 @@ public class PlatformConstants {
      * 群组事件消费分组
      */
     public static final String EVENT_GROUP_CONSUMER_GROUP = "event_group_consumer_group";
+
+    /**
+     * 私聊消息
+     */
+    public static final String TYPE_MESSAGE_PRIVATE = "type_private";
+    /**
+     * 群聊消息
+     */
+    public static final String TYPE_MESSAGE_GROUP = "type_group";
+
+    /**
+     * 拉取历史消息限制
+     */
+    public static final int PULL_HISTORY_MESSAGE_LIMIT_COUNR = 100;
+
+    /**
+     * 默认的页码
+     */
+    public static final int DEFAULT_PAGE = 1;
+
+    /**
+     * 默认每页记录数
+     */
+    public static final int DEFAULT_PAGE_SIZE = 10;
+
+    /**
+     * 触发上传缩略的限制
+     */
+    public static final int IMAGE_COMPRESS_LIMIT = 30 * 1024;
+
+    /**
+     * 压缩后的文件大小
+     */
+    public static final int IMAGE_COMPRESS_SIZE = 30;
+
+    /**
+     * WEBRTC Session过期时间
+     */
+    public static final Long WEBRTC_SESSION_CACHE_EXPIRE = 12L;
 
     /**
      * 默认Dubbo版本

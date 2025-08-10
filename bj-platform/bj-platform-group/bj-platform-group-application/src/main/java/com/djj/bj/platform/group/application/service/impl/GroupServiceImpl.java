@@ -368,6 +368,15 @@ public class GroupServiceImpl implements GroupService {
         return groupMemberDomainService.updateHeadImgByUserId(headImg, userId);
     }
 
+    @Override
+    public List<Long> getGroupIdsByUserId(Long userId) {
+        List<GroupMemberSimpleVO> list = this.getGroupMemberSimpleVOList(userId);
+        if (CollectionUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+        return list.stream().map((GroupMemberSimpleVO::getGroupId)).toList();
+    }
+
     @NotNull
     private List<GroupMemberVO> getGroupMemberVOS(Long groupId) {
         List<GroupMemberVO> memberList = groupMemberDomainService.getGroupMemberVoListByGroupId(groupId);

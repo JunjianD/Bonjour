@@ -33,10 +33,10 @@ public class GroupMessageVO {
     private Long groupId;
 
     @Schema(description = "发送者ID")
-    private Long senderId;
+    private Long sendId;
 
     @Schema(description = "发送者昵称")
-    private String senderNickName;
+    private String sendNickName;
 
     @Schema(description = "消息内容")
     private String content;
@@ -46,6 +46,9 @@ public class GroupMessageVO {
 
     @Schema(description = "被@用户列表")
     private List<Long> atUserIds;
+
+    @Schema(description = "@用户列表")
+    private String atUserIdsStr;
 
     @Schema(description = "消息状态")
     private Integer status;

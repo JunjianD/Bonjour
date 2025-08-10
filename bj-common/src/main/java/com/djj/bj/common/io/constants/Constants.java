@@ -147,19 +147,19 @@ public class Constants {
     public static final int MAX_GROUP_MEMBER_COUNT = 500; // 最大群聊人数限制为500人
 
     /**
-     * 已读群聊消息位置
+     * 已读群聊消息位置(已读最大id)
      */
-    public static final String GROUP_MESSAGE_READ_POSITION = "group_message_read:position";
+    public static final String GROUP_MESSAGE_READ_POSITION = "bj:read:group:position";
 
     /**
      * webrtc 会话信息
      */
-    public static final String WEBRTC_SESSION_INFO = "webrtc:session:info";
+    public static final String WEBRTC_SESSION = "bj:webrtc:session";
 
     /**
      * 缓存前缀
      */
-    public static final String CACHE_PREFIX = "cache:";
+    public static final String CACHE_PREFIX = "bj:cache:";
 
     /**
      * 缓存是否好友

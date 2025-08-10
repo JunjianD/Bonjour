@@ -128,4 +128,9 @@ public interface GroupService {
      * @return 是否更新成功
      */
     boolean updateHeadImgByUserId(String headImg, Long userId);
+
+    /**
+     * 根据用户id拉取群组id列表
+     */
+    List<Long> getGroupIdsByUserId(Long userId);
 }

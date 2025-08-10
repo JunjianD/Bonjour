@@ -29,10 +29,10 @@ public class PrivateMessageVO {
     private Long id;
 
     @Schema(description = "发送者ID")
-    private Long senderId;
+    private Long sendId;
 
     @Schema(description = "接收者ID")
-    private Long receiverId;
+    private Long recvId;
 
     @Schema(description = "私信内容")
     private String content;
