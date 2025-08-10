@@ -55,4 +55,9 @@ public class GroupDubboServiceImpl implements GroupDubboService {
     public List<GroupMemberSimpleVO> getGroupMemberSimpleVOList(Long userId) {
         return groupService.getGroupMemberSimpleVOList(userId);
     }
+
+    @Override
+    public List<Long> getGroupIdsByUserId(Long userId) {
+        return groupService.getGroupIdsByUserId(userId);
+    }
 }

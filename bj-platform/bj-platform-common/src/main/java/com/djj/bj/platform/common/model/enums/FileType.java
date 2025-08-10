@@ -16,11 +16,13 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum FileType {
-    FILE(0, "文件"),
-    IMAGE(1, "图片"),
-    VIDEO(2, "视频"),
-    AUDIO(3, "语音");
+    FILE(0, "/file/", "文件"),
+    IMAGE(1, "/image/", "图片"),
+    VIDEO(2, "/video/", "视频"),
+    AUDIO(3, "audio", "语音");
 
     private final Integer code;
+    private final String path;
     private final String desc;
+
 }

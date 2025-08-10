@@ -48,4 +48,9 @@ public interface GroupDubboService {
      * @return 用户在各个群组中的信息列表
      */
     List<GroupMemberSimpleVO> getGroupMemberSimpleVOList(Long userId);
+
+    /**
+     * 根据用户id获取群组id列表
+     */
+    List<Long> getGroupIdsByUserId(Long userId);
 }
