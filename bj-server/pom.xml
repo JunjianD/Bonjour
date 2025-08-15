@@ -25,12 +25,4 @@
         <module>bj-server-starter</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.djj</groupId>
-            <artifactId>bj-common</artifactId>
-            <version>1.0</version>
-        </dependency>
-    </dependencies>
-
 </project>
