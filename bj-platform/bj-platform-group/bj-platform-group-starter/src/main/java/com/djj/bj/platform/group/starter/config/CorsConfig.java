@@ -1,4 +1,4 @@
-package com.djj.bj.platform.group.config;
+package com.djj.bj.platform.group.starter.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

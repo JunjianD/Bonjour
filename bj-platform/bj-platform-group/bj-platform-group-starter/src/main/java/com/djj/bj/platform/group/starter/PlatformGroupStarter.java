@@ -1,4 +1,4 @@
-package com.djj.bj.platform.group;
+package com.djj.bj.platform.group.starter;
 
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.mybatis.spring.annotation.MapperScan;

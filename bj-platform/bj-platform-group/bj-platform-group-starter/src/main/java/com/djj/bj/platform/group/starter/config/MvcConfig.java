@@ -1,4 +1,4 @@
-package com.djj.bj.platform.group.config;
+package com.djj.bj.platform.group.starter.config;
 
 import com.djj.bj.platform.common.interceptor.Interceptor;
 import jakarta.annotation.Resource;
