@@ -253,7 +253,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserVO> findUserByName(String name) {
         List<User> userList = userDomainService.findUserByName(name);
-        // TODO 调用Client的方法后处理在线状态
         if (CollectionUtil.isEmpty(userList)) {
             return Collections.emptyList();
         }

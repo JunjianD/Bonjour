@@ -24,7 +24,7 @@ public class SnowFlakeLoader {
     public static final String DATA_CENTER_ID = "data.center.id";
     public static final String MACHINE_ID = "machine.id";
 
-    private volatile static Properties properties;
+    private static final Properties properties;
 
     static {
         properties = new Properties();
