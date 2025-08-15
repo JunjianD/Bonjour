@@ -11,7 +11,9 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,11 +33,11 @@ public class FileController {
     @Resource
     private FileService fileService;
 
-    @PostMapping("/image/upload")
+    @PostMapping(value = "/image/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上传图片", description = "上传图片,上传后返回原图和缩略图的url", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<UploadImageVO> uploadImage(@Parameter(name = "图片", description = "要上传的图片") MultipartFile file) {
+    public ResponseMessage<UploadImageVO> uploadImage(@RequestPart(name = "file") MultipartFile file) {
         return ResponseMessageFactory.getSuccessResponseMessage(fileService.uploadImage(file));
     }
 
@@ -44,7 +46,7 @@ public class FileController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
 
     })
-    public ResponseMessage<String> uploadFile(@Parameter(name = "文件", description = "要上传的文件") MultipartFile file) {
+    public ResponseMessage<String> uploadFile(@RequestPart(name = "file") MultipartFile file) {
         return ResponseMessageFactory.getSuccessResponseMessage(fileService.uploadFile(file));
     }
 }

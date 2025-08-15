@@ -148,7 +148,7 @@ public abstract class BaseRuleChainService implements RuleChainService {
         // 存放 session
         String strJson = JwtUtils.getInfo(token);
         if (StrUtil.isEmpty(strJson)) {
-            logger.error("BaseRuleChainService | token已失效，url | {}", request.getRequestURI());
+            logger.error("BaseRuleChainService | 解析失败，token已失效，url | {}", request.getRequestURI());
             throw new BJException(HttpCode.INVALID_TOKEN);
         }
         return JSON.parseObject(strJson, UserSession.class);

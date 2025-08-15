@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -68,7 +67,7 @@ public class WebSocketServer implements NettyServer {
                         pipeline.addLast("http-codec", new HttpServerCodec());
                         pipeline.addLast("http-aggregator", new HttpObjectAggregator(65535)); // 聚合HTTP消息
                         pipeline.addLast("http-chunked", new ChunkedWriteHandler()); // 支持大文件传输
-                        pipeline.addLast("websocket-handler", new WebSocketServerProtocolHandler("/ws")); // WebSocket协议处理器
+                        pipeline.addLast("websocket-handler", new WebSocketServerProtocolHandler("/bj")); // WebSocket协议处理器
                         pipeline.addLast("encode", new WebSocketMessageProtocolEncoder()); // 替换为实际的编码器
                         pipeline.addLast("decode", new WebSocketMessageProtocolDecoder()); // 替换为实际的解码器
                         pipeline.addLast("handler", new ChannelHandlerImpl()); // 替换为实际的处理器

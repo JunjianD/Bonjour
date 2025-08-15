@@ -12,17 +12,26 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.SocketOptions;
+import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.resource.ClientResources;
 import io.lettuce.core.resource.DefaultClientResources;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -44,32 +53,39 @@ public class RedisPoolConfig {
     private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
 
-//    @Value("${spring.data.redis.lettuce.pool.max-idle}")
-//    private int maxIdle;
-//    @Value("${spring.data.redis.lettuce.pool.min-idle}")
-//    private int minIdle;
-//    @Value("${spring.data.redis.lettuce.pool.max-active}")
-//    private int maxTotal;
-//    @Value("${spring.data.redis.lettuce.pool.max-wait}")
-//    private long maxWait;
-//    @Value("${spring.data.redis.host}")
-//    private String host;
-//    @Value("${spring.data.redis.port}")
-//    private int port;
-//    @Value("${spring.data.redis.password}")
-//    private String password;
-//    @Value("${spring.data.redis.database}")
-//    private int database;
+    @Value("${spring.data.redis.lettuce.pool.max-idle}")
+    private int maxIdle;
+    @Value("${spring.data.redis.lettuce.pool.min-idle}")
+    private int minIdle;
+    @Value("${spring.data.redis.lettuce.pool.max-active}")
+    private int maxTotal;
+    @Value("${spring.data.redis.lettuce.pool.max-wait}")
+    private Duration maxWait;
+    @Value("${spring.data.redis.host}")
+    private String host;
+    @Value("${spring.data.redis.port}")
+    private int port;
+    @Value("${spring.data.redis.password}")
+    private String password;
+    @Value("${spring.data.redis.database}")
+    private int database;
 
-//    @Bean
-//    public GenericObjectPoolConfig<StatefulConnection<?, ?>> genericObjectPoolConfig() {
-//        GenericObjectPoolConfig<StatefulConnection<?, ?>> poolConfig = new GenericObjectPoolConfig<>();
-//        poolConfig.setMaxIdle(maxIdle);
-//        poolConfig.setMinIdle(minIdle);
-//        poolConfig.setMaxTotal(maxTotal);
-//        poolConfig.setMaxWait(Duration.ofMillis(maxWait));
-//        return poolConfig;
-//    }
+    @Bean
+    public GenericObjectPoolConfig<StatefulConnection<?, ?>> genericObjectPoolConfig() {
+        GenericObjectPoolConfig<StatefulConnection<?, ?>> poolConfig = new GenericObjectPoolConfig<>();
+        poolConfig.setMaxIdle(maxIdle);
+        poolConfig.setMinIdle(minIdle);
+        poolConfig.setMaxTotal(maxTotal);
+        poolConfig.setMaxWait(maxWait);
+
+        // 开启空闲连接扫描清理
+        poolConfig.setTestWhileIdle(true);
+//        // 不在借出/归还时做额外检查，降低延迟
+//        poolConfig.setTestOnBorrow(false);
+//        poolConfig.setTestOnReturn(false);
+        return poolConfig;
+    }
+
 
     @Bean(destroyMethod = "shutdown")
     @ConditionalOnMissingBean(ClientResources.class)
@@ -77,28 +93,36 @@ public class RedisPoolConfig {
         return DefaultClientResources.create();
     }
 
-//    @Bean
-//    public RedisStandaloneConfiguration redisStandaloneConfiguration() {
-//        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-//        redisStandaloneConfiguration.setDatabase(database);
-//        redisStandaloneConfiguration.setHostName(host);
-//        redisStandaloneConfiguration.setPassword(password);
-//        redisStandaloneConfiguration.setPort(port);
-//        return redisStandaloneConfiguration;
-//    }
+    @Bean
+    public RedisStandaloneConfiguration redisStandaloneConfiguration() {
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+        redisStandaloneConfiguration.setDatabase(database);
+        redisStandaloneConfiguration.setHostName(host);
+        redisStandaloneConfiguration.setPassword(password);
+        redisStandaloneConfiguration.setPort(port);
+        return redisStandaloneConfiguration;
+    }
 
-//    @Bean
-//    public LettuceClientConfiguration lettuceClientConfiguration(GenericObjectPoolConfig<StatefulConnection<?,?>> genericObjectPoolConfig, ClientResources lettuceClientResources) {
-//        return LettucePoolingClientConfiguration.builder()
-//                .clientResources(lettuceClientResources)
-//                .poolConfig(genericObjectPoolConfig)
-//                .build();
-//    }
+    @Bean
+    public LettuceClientConfiguration lettuceClientConfiguration(GenericObjectPoolConfig<StatefulConnection<?, ?>> genericObjectPoolConfig, ClientResources lettuceClientResources) {
+        return LettucePoolingClientConfiguration.builder()
+                .clientResources(lettuceClientResources)
+                .poolConfig(genericObjectPoolConfig)
+                .commandTimeout(Duration.ofSeconds(10))
+                .shutdownTimeout(Duration.ofSeconds(10))
+                .clientOptions(ClientOptions.builder()
+                        .autoReconnect(true)                  // 自动重连
+                        .socketOptions(SocketOptions.builder()
+                                .keepAlive(true)             // TCP Keep-Alive
+                                .build())
+                        .build())
+                .build();
+    }
 
-//    @Bean
-//    public LettuceConnectionFactory lettuceConnectionFactory(RedisStandaloneConfiguration redisSentinelConfiguration, LettuceClientConfiguration lettuceClientConfiguration) {
-//        return new LettuceConnectionFactory(redisSentinelConfiguration,lettuceClientConfiguration);
-//    }
+    @Bean
+    public LettuceConnectionFactory lettuceConnectionFactory(RedisStandaloneConfiguration redisSentinelConfiguration, LettuceClientConfiguration lettuceClientConfiguration) {
+        return new LettuceConnectionFactory(redisSentinelConfiguration, lettuceClientConfiguration);
+    }
 
 
 //    spring boot 2 的写法
