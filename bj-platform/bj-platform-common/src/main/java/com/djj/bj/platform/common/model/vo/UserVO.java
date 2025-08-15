@@ -1,5 +1,7 @@
 package com.djj.bj.platform.common.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,7 @@ import org.hibernate.validator.constraints.Length;
 public class UserVO {
     @NotNull(message = "用户ID不可为空")
     @Schema(description = "用户ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     @NotNull(message = "用户名不可为空")

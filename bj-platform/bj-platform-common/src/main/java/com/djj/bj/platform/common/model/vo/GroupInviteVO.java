@@ -1,5 +1,7 @@
 package com.djj.bj.platform.common.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +31,7 @@ public class GroupInviteVO {
 
     @NotNull(message = "群组ID不可为空")
     @Schema(description = "群组ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long groupId;
 
     @NotEmpty(message = "好友ID列表不可为空")
