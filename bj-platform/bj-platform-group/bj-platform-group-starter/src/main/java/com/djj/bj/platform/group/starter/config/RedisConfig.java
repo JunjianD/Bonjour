@@ -1,4 +1,4 @@
-package com.djj.bj.platform.group.config;
+package com.djj.bj.platform.group.starter.config;
 
 import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.EnableCaching;
