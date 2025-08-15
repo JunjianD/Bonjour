@@ -1,5 +1,7 @@
 package com.djj.bj.platform.common.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -25,6 +27,7 @@ import lombok.Setter;
 public class FriendVO {
     @NotNull(message = "好友ID不可为空")
     @Schema(description = "好友ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     @NotNull(message = "好友昵称不可为空")

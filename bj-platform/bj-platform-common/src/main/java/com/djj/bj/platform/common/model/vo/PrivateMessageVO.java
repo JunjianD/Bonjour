@@ -1,5 +1,7 @@
 package com.djj.bj.platform.common.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,12 +28,15 @@ import java.util.Date;
 public class PrivateMessageVO {
 
     @Schema(description = "私信ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     @Schema(description = "发送者ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long sendId;
 
     @Schema(description = "接收者ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long recvId;
 
     @Schema(description = "私信内容")

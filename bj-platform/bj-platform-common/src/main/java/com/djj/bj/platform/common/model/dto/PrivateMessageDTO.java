@@ -1,5 +1,7 @@
 package com.djj.bj.platform.common.model.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +29,7 @@ import org.hibernate.validator.constraints.Length;
 public class PrivateMessageDTO {
     @NotNull(message = "接收用户ID不可为空")
     @Schema(description = "接收用户ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long recvId;
 
     @Length(max = 1024, message = "内容长度不得大于1024")

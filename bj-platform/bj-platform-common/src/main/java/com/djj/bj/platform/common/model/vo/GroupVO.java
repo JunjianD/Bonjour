@@ -1,5 +1,7 @@
 package com.djj.bj.platform.common.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -25,6 +27,7 @@ import org.hibernate.validator.constraints.Length;
 @Schema(description = "群组信息值对象（VO）")
 public class GroupVO {
     @Schema(description = "群组ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     @Length(max = 32, message = "群组名称长度不能大于32")
@@ -33,6 +36,7 @@ public class GroupVO {
     private String name;
 
     @Schema(description = "群主id")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long ownerId;
 
     @Schema(description = "群头像")
