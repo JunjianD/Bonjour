@@ -32,11 +32,11 @@ import lombok.Setter;
 )
 public class LoginDTO {
 
-    @Max(value = 1, message = "登录终端类型取值范围:0,1")
-    @Min(value = 0, message = "登录终端类型取值范围:0,1")
+    @Max(value = 3, message = "登录终端类型取值范围:0~3")
+    @Min(value = 0, message = "登录终端类型取值范围:0~3")
     @NotNull(message = "登录终端类型不可为空")
     @Schema(
-            description = "登录终端 0:web  1:app",
+            description = "登录终端类型值",
             example = "0"
     )
     private Integer terminal;
