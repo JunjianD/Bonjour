@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @author jj_D
  * @version 1.0
  * @projectName Bonjour
- * @package com.djj.bj.infrastructure.holder
+ * @package com.djj.bj.server.infrastructure.holder
  * @className SpringContextHolder
  * @date 2025/6/17 22:03
  */

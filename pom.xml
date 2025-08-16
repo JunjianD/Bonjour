@@ -365,6 +365,12 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>3.1.4</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>3.3.1</version>
                     <executions>
@@ -391,6 +397,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+            </plugin>
+
             <!--            发布代码Jar插件-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -404,16 +416,16 @@
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <!--这里的id与settings.xml中的servers节点配置的用户ID一致，这样才能使用配置的用户去上传到maven私有仓库 -->
-            <id>djj</id>
-            <url>http://117.72.85.211:8081/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <!--这里的id与settings.xml中的servers节点配置的用户ID一致，这样才能使用配置的用户去上传到maven私有仓库 -->
-            <id>djj</id>
-            <url>http://117.72.85.211:8081/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <!--    <distributionManagement>-->
+    <!--        <repository>-->
+    <!--            &lt;!&ndash;这里的id与settings.xml中的servers节点配置的用户ID一致，这样才能使用配置的用户去上传到maven私有仓库 &ndash;&gt;-->
+    <!--            <id>djj</id>-->
+    <!--            <url>http://117.72.85.211:8081/repository/maven-releases/</url>-->
+    <!--        </repository>-->
+    <!--        <snapshotRepository>-->
+    <!--            &lt;!&ndash;这里的id与settings.xml中的servers节点配置的用户ID一致，这样才能使用配置的用户去上传到maven私有仓库 &ndash;&gt;-->
+    <!--            <id>djj</id>-->
+    <!--            <url>http://117.72.85.211:8081/repository/maven-snapshots/</url>-->
+    <!--        </snapshotRepository>-->
+    <!--    </distributionManagement>-->
 </project>
