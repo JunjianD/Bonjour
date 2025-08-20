@@ -19,7 +19,6 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -116,7 +115,6 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void addFriend(Long friendId) {
         if (friendId == null) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "添加好友时，好友ID不能为空");
@@ -125,44 +123,45 @@ public class FriendServiceImpl implements FriendService {
         if (Objects.equals(userId, friendId)) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "不允许添加自己为好友");
         }
-        FriendCommand friendCommand = new FriendCommand(userId, friendId);
-        User user = userDubboService.getUserById(friendId);
-        domainService.bindFriend(
-                friendCommand,
-                user == null ? "" : user.getHeadImage(),
-                user == null ? "" : user.getNickName()
-        );
-        friendCommand = new FriendCommand(friendId, userId);
-        user = userDubboService.getUserById(userId);
-        domainService.bindFriend(
-                friendCommand,
-                user == null ? "" : user.getHeadImage(),
-                user == null ? "" : user.getNickName()
-        );
+        User user = userDubboService.getUserById(userId);
+        User friend = userDubboService.getUserById(friendId);
+        Boolean[] results = domainService.bindFriend(userId, user, friendId, friend);
+        if (BooleanUtil.isTrue(results[0])) {
+            domainService.publishEvent(userId, friendId, PlatformConstants.FRIEND_HANDLER_BIND);
+        }
+        if (BooleanUtil.isTrue(results[1])) {
+            domainService.publishEvent(friendId, userId, PlatformConstants.FRIEND_HANDLER_BIND);
+        }
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void delFriend(Long friendId) {
         if (friendId == null) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "删除好友时，好友ID不能为空");
         }
         Long userId = SessionContext.getUserSession().getUserId();
-
-        FriendCommand friendCommand = new FriendCommand(userId, friendId);
-        domainService.unbindFriend(friendCommand);
-
-        friendCommand = new FriendCommand(friendId, userId);
-        domainService.unbindFriend(friendCommand);
+        if (Objects.equals(userId, friendId)) {
+            throw new BJException(HttpCode.PROGRAM_ERROR, "自己无法删除自己");
+        }
+        Boolean[] results = domainService.unbindFriend(userId, friendId);
+        if (BooleanUtil.isTrue(results[0])) {
+            domainService.publishEvent(userId, friendId, PlatformConstants.FRIEND_HANDLER_UNBIND);
+        }
+        if (BooleanUtil.isTrue(results[1])) {
+            domainService.publishEvent(friendId, userId, PlatformConstants.FRIEND_HANDLER_UNBIND);
+        }
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void update(FriendVO vo) {
         if (vo == null || vo.getId() == null) {
             throw new BJException(HttpCode.PROGRAM_ERROR);
         }
-        domainService.update(vo, SessionContext.getUserSession().getUserId());
+        Long userId = SessionContext.getUserSession().getUserId();
+        Boolean result = domainService.update(vo, userId);
+        if (BooleanUtil.isTrue(result)) {
+            domainService.publishEvent(userId, vo.getId(), PlatformConstants.FRIEND_HANDLER_UPDATE);
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.djj.bj.platform.friend.domain.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.djj.bj.platform.common.model.entity.Friend;
+import com.djj.bj.platform.common.model.entity.User;
 import com.djj.bj.platform.common.model.vo.FriendVO;
 import com.djj.bj.platform.friend.domain.model.command.FriendCommand;
 import org.apache.ibatis.annotations.Param;
@@ -53,21 +54,35 @@ public interface FriendDomainService extends IService<Friend> {
      */
     Boolean isFriend(Long userId1, Long userId2);
 
+
     /**
-     * 绑定好友关系
+     * 绑定双方好友关系
      *
-     * @param friendCommand 好友命令对象
-     * @param headImg       好友头像
-     * @param nickName      好友昵称
+     * @param userId   用户id
+     * @param user     用户对象
+     * @param friendId 好友id
+     * @param friend   好友对象
+     * @return 关系是否成功{ 用户->好友, 好友->用户 }
      */
-    void bindFriend(FriendCommand friendCommand, String headImg, String nickName);
+    Boolean[] bindFriend(Long userId, User user, Long friendId, User friend);
+
+    /**
+     * 发布好友事件
+     *
+     * @param userId    用户id
+     * @param friendId  好友id
+     * @param eventType 事件类型
+     */
+    void publishEvent(Long userId, Long friendId, String eventType);
 
     /**
      * 解除好友关系
      *
-     * @param friendCommand 好友命令对象
+     * @param userId   用户id
+     * @param friendId 好友id
+     * @return 解绑关系是否成功{ 用户->好友, 好友->用户 }
      */
-    void unbindFriend(FriendCommand friendCommand);
+    Boolean[] unbindFriend(Long userId, Long friendId);
 
     /**
      * 更新好友数据
@@ -75,7 +90,7 @@ public interface FriendDomainService extends IService<Friend> {
      * @param vo     好友视图对象
      * @param userId 用户ID
      */
-    void update(FriendVO vo, Long userId);
+    Boolean update(FriendVO vo, Long userId);
 
     /**
      * 获取好友信息

@@ -17,6 +17,21 @@ public class PlatformConstants {
     public static final Long DEFAULT_REDIS_CACHE_EXPIRE_TIME = 10L;
 
     /**
+     * 缓存空值的过期时间，单位为秒
+     */
+    public static final Long DEFAULT_REDIS_CACHE_NULL_EXPIRE_TIME = 60L;
+
+    /**
+     * 缓存的空数据
+     */
+    public static final String EMPTY_VALUE = "";
+
+    /**
+     * 缓存空列表的值
+     */
+    public static final String EMPTY_LIST_VALUE = "[]";
+
+    /**
      * 绑定好友
      */
     public static final String FRIEND_HANDLER_BIND = "bind";

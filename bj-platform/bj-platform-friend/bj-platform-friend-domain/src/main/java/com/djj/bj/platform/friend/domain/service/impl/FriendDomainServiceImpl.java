@@ -6,6 +6,7 @@ import com.djj.bj.common.mq.event.MessageEventSenderService;
 import com.djj.bj.platform.common.exception.BJException;
 import com.djj.bj.platform.common.model.constants.PlatformConstants;
 import com.djj.bj.platform.common.model.entity.Friend;
+import com.djj.bj.platform.common.model.entity.User;
 import com.djj.bj.platform.common.model.enums.HttpCode;
 import com.djj.bj.platform.common.model.vo.FriendVO;
 import com.djj.bj.platform.friend.domain.event.FriendEvent;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -67,61 +69,62 @@ public class FriendDomainServiceImpl extends ServiceImpl<FriendRepository, Frien
     }
 
     @Override
-    public void bindFriend(FriendCommand friendCommand, String headImg, String nickName) {
-        if (friendCommand == null || friendCommand.isEmpty()) {
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean[] bindFriend(Long userId, User user, Long friendId, User friend) {
+        if (userId == null || friendId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
         }
-        boolean result = false;
-        Integer checkStatus = baseMapper.checkFriend(friendCommand.getFriendId(), friendCommand.getUserId());
+        boolean result1 = false, result2 = false;
+        Integer checkStatus = baseMapper.checkFriend(friendId, userId);
         if (checkStatus == null) {
-            Friend friend = new Friend();
-            friend.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
-            friend.setUserId(friendCommand.getUserId());
-            friend.setFriendId(friendCommand.getFriendId());
-            friend.setFriendHeadImage(headImg);
-            friend.setFriendNickName(nickName);
-            result = this.save(friend);
+            Friend friendship = new Friend();
+            friendship.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
+            friendship.setUserId(userId);
+            friendship.setFriendId(friendId);
+            friendship.setFriendHeadImage(friend == null ? "" : friend.getHeadImage());
+            friendship.setFriendNickName(friend == null ? "" : friend.getNickName());
+            result1 = this.save(friendship);
         }
-        if (result) {
-            FriendEvent friendEvent = new FriendEvent(
-                    friendCommand.getUserId(),
-                    friendCommand.getFriendId(),
-                    PlatformConstants.FRIEND_HANDLER_BIND,
-                    this.getTopicEvent()
-            );
-            messageEventSenderService.send(friendEvent);
+        checkStatus = baseMapper.checkFriend(userId, friendId);
+        if (checkStatus == null) {
+            Friend friendship = new Friend();
+            friendship.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
+            friendship.setUserId(friendId);
+            friendship.setFriendId(userId);
+            friendship.setFriendHeadImage(user == null ? "" : user.getHeadImage());
+            friendship.setFriendNickName(user == null ? "" : user.getNickName());
+            result2 = this.save(friendship);
         }
+        return new Boolean[]{result1, result2};
     }
 
     @Override
-    public void unbindFriend(FriendCommand friendCommand) {
-        if (friendCommand == null || friendCommand.isEmpty()) {
+    public void publishEvent(Long userId, Long friendId, String eventType) {
+        FriendEvent friendEvent = new FriendEvent(
+                userId,
+                friendId,
+                eventType,
+                this.getTopicEvent()
+        );
+        messageEventSenderService.send(friendEvent);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean[] unbindFriend(Long userId, Long friendId) {
+        if (userId == null || friendId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
         }
-        int count = baseMapper.deleteFriend(friendCommand.getFriendId(), friendCommand.getUserId());
-        if (count > 0) {
-            FriendEvent friendEvent = new FriendEvent(
-                    friendCommand.getUserId(),
-                    friendCommand.getFriendId(),
-                    PlatformConstants.FRIEND_HANDLER_UNBIND,
-                    this.getTopicEvent()
-            );
-            messageEventSenderService.send(friendEvent);
-        }
+        boolean result1, result2;
+        result1 = baseMapper.deleteFriend(friendId, userId) > 0;
+        result2 = baseMapper.deleteFriend(userId, friendId) > 0;
+        return new Boolean[]{result1, result2};
     }
 
     @Override
-    public void update(FriendVO vo, Long userId) {
-        int count = baseMapper.updateFriend(vo.getHeadImage(), vo.getNickName(), vo.getId(), userId);
-        if (count > 0) {
-            FriendEvent friendEvent = new FriendEvent(
-                    userId,
-                    vo.getId(),
-                    PlatformConstants.FRIEND_HANDLER_UPDATE,
-                    this.getTopicEvent()
-            );
-            messageEventSenderService.send(friendEvent);
-        }
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean update(FriendVO vo, Long userId) {
+        return baseMapper.updateFriend(vo.getHeadImage(), vo.getNickName(), vo.getId(), userId) > 0;
     }
 
     @Override

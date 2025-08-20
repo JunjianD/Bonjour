@@ -2,6 +2,7 @@ package com.djj.bj.platform.message.starter.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -19,6 +20,7 @@ import java.util.Arrays;
  * @className CorsConfig
  * @date 2025/8/12 12:11
  */
+@Configuration
 public class CorsConfig {
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilter() {

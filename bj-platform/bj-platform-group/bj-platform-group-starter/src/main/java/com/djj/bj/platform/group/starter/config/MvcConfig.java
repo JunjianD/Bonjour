@@ -3,13 +3,14 @@ package com.djj.bj.platform.group.starter.config;
 import com.djj.bj.platform.common.interceptor.Interceptor;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * TODO
+ * MVC配置类
  *
  * @author jj_D
  * @version 1.0
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @className MvcConfig
  * @date 2025/8/4 12:04
  */
+@Configuration
 public class MvcConfig implements WebMvcConfigurer {
     @Resource
     private Interceptor interceptor;
