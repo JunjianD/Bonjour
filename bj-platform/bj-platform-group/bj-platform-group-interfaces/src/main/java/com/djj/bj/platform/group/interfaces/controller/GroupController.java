@@ -56,7 +56,7 @@ public class GroupController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @DeleteMapping("/delete/{groupId}")
-    public ResponseMessage deleteGroup(@NotNull(message = "群聊id不能为空") @PathVariable Long groupId) {
+    public ResponseMessage deleteGroup(@NotNull(message = "群聊id不能为空") @PathVariable("groupId") Long groupId) {
         groupService.deleteGroup(groupId);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -65,7 +65,7 @@ public class GroupController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @GetMapping("/find/{groupId}")
-    public ResponseMessage<GroupVO> findGroup(@NotNull(message = "群聊id不能为空") @PathVariable Long groupId) {
+    public ResponseMessage<GroupVO> findGroup(@NotNull(message = "群聊id不能为空") @PathVariable("groupId") Long groupId) {
         return ResponseMessageFactory.getSuccessResponseMessage(groupService.findById(groupId));
     }
 
@@ -90,7 +90,7 @@ public class GroupController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @GetMapping("/members/{groupId}")
-    public ResponseMessage<List<GroupMemberVO>> findGroupMembers(@NotNull(message = "群聊id不能为空") @PathVariable Long groupId) {
+    public ResponseMessage<List<GroupMemberVO>> findGroupMembers(@NotNull(message = "群聊id不能为空") @PathVariable("groupId") Long groupId) {
         return ResponseMessageFactory.getSuccessResponseMessage(groupService.findGroupMembers(groupId));
     }
 
@@ -98,7 +98,7 @@ public class GroupController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @DeleteMapping("/quit/{groupId}")
-    public ResponseMessage quitGroup(@NotNull(message = "群聊id不能为空") @PathVariable Long groupId) {
+    public ResponseMessage quitGroup(@NotNull(message = "群聊id不能为空") @PathVariable("groupId") Long groupId) {
         groupService.quitGroup(groupId);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -107,8 +107,8 @@ public class GroupController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @DeleteMapping("/kick/{groupId}")
-    public ResponseMessage kickGroup(@NotNull(message = "群聊id不能为空") @PathVariable Long groupId,
-                                     @NotNull(message = "用户id不能为空") @RequestParam Long userId) {
+    public ResponseMessage kickGroup(@NotNull(message = "群聊id不能为空") @PathVariable("groupId") Long groupId,
+                                     @NotNull(message = "用户id不能为空") @RequestParam(value = "userId") Long userId) {
         groupService.kickGroup(groupId, userId);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }

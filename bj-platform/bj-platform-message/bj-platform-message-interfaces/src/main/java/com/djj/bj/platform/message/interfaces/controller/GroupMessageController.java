@@ -56,7 +56,7 @@ public class GroupMessageController {
     @Operation(summary = "拉取消息", description = "拉取消息,一次最多拉取100条", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<List<GroupMessageVO>> loadMessage(@RequestParam(value = "最小消息ID") Long minId) {
+    public ResponseMessage<List<GroupMessageVO>> loadMessage(@RequestParam(value = "minId") Long minId) {
         return ResponseMessageFactory.getSuccessResponseMessage(groupMessageService.loadMessage(minId));
     }
 
@@ -64,9 +64,9 @@ public class GroupMessageController {
     @Operation(summary = "查询聊天记录", description = "查询聊天记录", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<List<GroupMessageVO>> recallMessage(@NotNull(message = "群聊id不能为空") @RequestParam(value = "群id") Long groupId,
-                                                               @NotNull(message = "页码不能为空") @RequestParam(value = "页码") Long page,
-                                                               @NotNull(message = "size不能为空") @RequestParam(value = "页大小") Long size) {
+    public ResponseMessage<List<GroupMessageVO>> recallMessage(@NotNull(message = "群聊id不能为空") @RequestParam(value = "groupId") Long groupId,
+                                                               @NotNull(message = "页码不能为空") @RequestParam(value = "page") Long page,
+                                                               @NotNull(message = "size不能为空") @RequestParam(value = "size") Long size) {
         return ResponseMessageFactory.getSuccessResponseMessage(groupMessageService.findHistoryMessage(groupId, page, size));
     }
 
@@ -74,7 +74,7 @@ public class GroupMessageController {
     @Operation(summary = "消息已读", description = "将群聊中的消息状态置为已读", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage readedMessage(@RequestParam(value = "群id") Long groupId) {
+    public ResponseMessage readedMessage(@RequestParam(value = "groupId") Long groupId) {
         groupMessageService.readedMessage(groupId);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -83,7 +83,7 @@ public class GroupMessageController {
     @Operation(summary = "撤回消息", description = "撤回群聊消息", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<Long> recallMessage(@NotNull(message = "消息id不能为空") @PathVariable Long id) {
+    public ResponseMessage<Long> recallMessage(@NotNull(message = "消息id不能为空") @PathVariable("id") Long id) {
         groupMessageService.withdrawMessage(id);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }

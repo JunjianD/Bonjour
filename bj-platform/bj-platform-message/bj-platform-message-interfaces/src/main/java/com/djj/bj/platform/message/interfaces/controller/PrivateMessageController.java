@@ -56,7 +56,7 @@ public class PrivateMessageController {
     @Operation(summary = "拉取消息", description = "拉取消息,一次最多拉取100条", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<List<PrivateMessageVO>> loadMessage(@RequestParam(value = "最小消息id") Long minId) {
+    public ResponseMessage<List<PrivateMessageVO>> loadMessage(@RequestParam(value = "minId") Long minId) {
         return ResponseMessageFactory.getSuccessResponseMessage(privateMessageService.loadMessage(minId));
     }
 
@@ -64,9 +64,9 @@ public class PrivateMessageController {
     @Operation(summary = "查询聊天记录", description = "查询聊天记录", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<List<PrivateMessageVO>> recallMessage(@NotNull(message = "好友id不能为空") @RequestParam(value = "好友id") Long friendId,
-                                                                 @NotNull(message = "页码不能为空") @RequestParam(value = "页码") Long page,
-                                                                 @NotNull(message = "size不能为空") @RequestParam(value = "页大小") Long size) {
+    public ResponseMessage<List<PrivateMessageVO>> recallMessage(@NotNull(message = "好友id不能为空") @RequestParam(value = "friendId") Long friendId,
+                                                                 @NotNull(message = "页码不能为空") @RequestParam(value = "page") Long page,
+                                                                 @NotNull(message = "size不能为空") @RequestParam(value = "size") Long size) {
         return ResponseMessageFactory.getSuccessResponseMessage(privateMessageService.getHistoryMessage(friendId, page, size));
     }
 
@@ -74,7 +74,7 @@ public class PrivateMessageController {
     @Operation(summary = "消息已读", description = "将会话中接收的消息状态置为已读", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<String> readedMessage(@RequestParam(value = "好友id") Long friendId) {
+    public ResponseMessage<String> readedMessage(@RequestParam(value = "friendId") Long friendId) {
         privateMessageService.readedMessage(friendId);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -83,7 +83,7 @@ public class PrivateMessageController {
     @Operation(summary = "撤回消息", description = "撤回私聊消息", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<Long> withdrawMessage(@NotNull(message = "消息id不能为空") @PathVariable Long id) {
+    public ResponseMessage<Long> withdrawMessage(@NotNull(message = "消息id不能为空") @PathVariable("id") Long id) {
         privateMessageService.withdrawMessage(id);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }

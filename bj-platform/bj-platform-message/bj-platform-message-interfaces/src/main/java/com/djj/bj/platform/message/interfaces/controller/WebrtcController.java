@@ -37,7 +37,7 @@ public class WebrtcController {
 
     })
     @PostMapping("/call")
-    public ResponseMessage<String> call(@RequestParam(value = "被呼叫者ID") Long uid, @RequestBody String offer) {
+    public ResponseMessage<String> call(@RequestParam(value = "uid") Long uid, @RequestBody String offer) {
         webrtcService.call(uid, offer);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -46,7 +46,7 @@ public class WebrtcController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @PostMapping("/cancel")
-    public ResponseMessage<String> cancel(@RequestParam(value = "被呼叫者ID") Long uid) {
+    public ResponseMessage<String> cancel(@RequestParam(value = "uid") Long uid) {
         webrtcService.cancel(uid);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -55,7 +55,7 @@ public class WebrtcController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @PostMapping("/failed")
-    public ResponseMessage<String> failed(@RequestParam(value = "被呼叫者ID") Long uid, @RequestParam(value = "失败原因") String reason) {
+    public ResponseMessage<String> failed(@RequestParam(value = "uid") Long uid, @RequestParam(value = "reason") String reason) {
         webrtcService.failed(uid, reason);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -64,7 +64,7 @@ public class WebrtcController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @PostMapping("/accept")
-    public ResponseMessage<String> accept(@RequestParam(value = "被呼叫者ID") Long uid, @RequestBody String answer) {
+    public ResponseMessage<String> accept(@RequestParam(value = "uid") Long uid, @RequestBody String answer) {
         webrtcService.accept(uid, answer);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -73,7 +73,7 @@ public class WebrtcController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @PostMapping("/reject")
-    public ResponseMessage<String> reject(@RequestParam(value = "被呼叫者ID") Long uid) {
+    public ResponseMessage<String> reject(@RequestParam(value = "uid") Long uid) {
         webrtcService.reject(uid);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -82,7 +82,7 @@ public class WebrtcController {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
     @PostMapping("/handup")
-    public ResponseMessage<String> leave(@RequestParam(value = "被呼叫者ID") Long uid) {
+    public ResponseMessage<String> leave(@RequestParam(value = "uid") Long uid) {
         webrtcService.leave(uid);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
@@ -91,7 +91,7 @@ public class WebrtcController {
     @Operation(method = "POST", summary = "同步candidate", description = "同步ICE候选者信息", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<String> forwardCandidate(@RequestParam Long uid, @RequestBody String candidate) {
+    public ResponseMessage<String> forwardCandidate(@RequestParam(value = "uid") Long uid, @RequestBody String candidate) {
         webrtcService.candidate(uid, candidate);
         return ResponseMessageFactory.getSuccessResponseMessage();
     }
