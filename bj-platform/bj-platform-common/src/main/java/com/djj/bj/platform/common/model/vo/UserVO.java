@@ -1,5 +1,6 @@
 package com.djj.bj.platform.common.model.vo;
 
+import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -59,4 +60,9 @@ public class UserVO {
 
     @Schema(description = "用户是否在线")
     private Boolean online;
+
+    @Override
+    public String toString() {
+        return JSON.toJSONString(this);
+    }
 }

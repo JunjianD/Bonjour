@@ -1,5 +1,6 @@
 package com.djj.bj.platform.common.model.vo;
 
+import com.alibaba.fastjson2.JSON;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,4 +28,9 @@ public class UploadImageVO {
 
     @Schema(description = "缩略图")
     private String thumbUrl;
+
+    @Override
+    public String toString() {
+        return JSON.toJSONString(this);
+    }
 }

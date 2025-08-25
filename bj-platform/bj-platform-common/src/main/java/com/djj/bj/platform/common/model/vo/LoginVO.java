@@ -1,5 +1,6 @@
 package com.djj.bj.platform.common.model.vo;
 
+import com.alibaba.fastjson2.JSON;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,4 +34,9 @@ public class LoginVO {
 
     @Schema(description = "refreshToken过期时间，单位秒")
     private Integer refreshTokenExpireTime;
+
+    @Override
+    public String toString() {
+        return JSON.toJSONString(this);
+    }
 }
