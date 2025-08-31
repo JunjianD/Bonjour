@@ -1,5 +1,7 @@
 package com.djj.bj.common.io.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +25,7 @@ public class SessionInfo {
     /**
      * 用户ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     /**

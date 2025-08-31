@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     private MessageSenderService messageSenderService;
 
     @Override
-    public LoginVO login(LoginDTO dto) { //TODO 登录不更新缓存，明天debug
+    public LoginVO login(LoginDTO dto) {
         if (dto == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
         }
@@ -82,6 +82,7 @@ public class UserServiceImpl implements UserService {
             throw new BJException(HttpCode.PASSWORD_ERROR, "用户名或密码错误");
         }
         UserSession userSession = BeanUtils.copyProperties(user, UserSession.class);
+        logger.info("userSession.userName：{}，userSession.nickName：{}", userSession.getUserName(), userSession.getNickName());
         userSession.setUserId(user.getUserId());
         userSession.setTerminalType(dto.getTerminal());
         String strJson = JSON.toJSONString(userSession);

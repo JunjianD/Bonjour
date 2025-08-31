@@ -1,9 +1,9 @@
 package com.djj.bj.platform.common.session;
 
 import com.djj.bj.common.io.model.SessionInfo;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * 用户会话信息类
@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Getter
+@Setter
 public class UserSession extends SessionInfo {
     /**
      * 用户名称

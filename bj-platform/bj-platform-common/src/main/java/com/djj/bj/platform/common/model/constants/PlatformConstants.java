@@ -228,6 +228,11 @@ public class PlatformConstants {
     public static final String FRIEND_UPDATE_CACHE_LOCK_KEY = "FRIEND_UPDATE_CACHE_LOCK_KEY_";
 
     /**
+     * 更新群组分布式缓存时用的锁前缀
+     */
+    public static final String GROUP_UPDATE_CACHE_LOCK_KEY = "GROUP_UPDATE_CACHE_LOCK_KEY_";
+
+    /**
      * 用户事件消费分组
      */
     public static final String EVENT_USER_CONSUMER_GROUP = "event_user_consumer_group";
