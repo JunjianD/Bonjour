@@ -63,4 +63,12 @@ public class ResponseMessageFactory {
         responseMessage.setMessage(httpCode.getMessage());
         return responseMessage;
     }
+
+    public static ResponseMessage<String> getSuccessResponseLongMessage(Long message) {
+        ResponseMessage<String> responseMessage = new ResponseMessage<>();
+        responseMessage.setCode(HttpCode.SUCCESS.getCode());
+        responseMessage.setMessage(HttpCode.SUCCESS.getMessage());
+        responseMessage.setData(String.valueOf(message));
+        return responseMessage;
+    }
 }
