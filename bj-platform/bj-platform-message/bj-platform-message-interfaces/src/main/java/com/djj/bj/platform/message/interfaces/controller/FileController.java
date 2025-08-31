@@ -1,6 +1,7 @@
 package com.djj.bj.platform.message.interfaces.controller;
 
 import com.djj.bj.platform.common.model.constants.PlatformConstants;
+import com.djj.bj.platform.common.model.enums.HttpCode;
 import com.djj.bj.platform.common.model.vo.UploadImageVO;
 import com.djj.bj.platform.common.response.ResponseMessage;
 import com.djj.bj.platform.common.response.ResponseMessageFactory;
@@ -47,6 +48,6 @@ public class FileController {
 
     })
     public ResponseMessage<String> uploadFile(@RequestPart(name = "file") MultipartFile file) {
-        return ResponseMessageFactory.getSuccessResponseMessage(fileService.uploadFile(file));
+        return ResponseMessageFactory.getSuccessResponseMessage(fileService.uploadFile(file), HttpCode.SUCCESS.getMessage());
     }
 }
