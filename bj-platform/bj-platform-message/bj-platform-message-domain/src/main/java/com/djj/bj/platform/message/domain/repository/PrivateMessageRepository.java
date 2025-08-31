@@ -26,6 +26,12 @@ public interface PrivateMessageRepository extends BaseMapper<PrivateMessage> {
 
     @Select({"<script> " +
             "select id as id, send_id as sendId, recv_id as recvId, content as content, type as type, status as status, send_time as sendTime " +
+            "from bj_private_message where id = #{messageId} " +
+            "</script>"})
+    PrivateMessageVO getPrivateMessageById(@Param("messageId") Long messageId);
+
+    @Select({"<script> " +
+            "select id as id, send_id as sendId, recv_id as recvId, content as content, type as type, status as status, send_time as sendTime " +
             "from bj_private_message where recv_id = #{userId} and status = 0 and send_id in   " +
             "<foreach collection='friendIds' item='friendId' index='index' separator=',' open='(' close=')'> " +
             " #{friendId} " +
@@ -69,15 +75,12 @@ public interface PrivateMessageRepository extends BaseMapper<PrivateMessage> {
             "</script>"})
     List<PrivateMessageVO> loadMessageByUserIdAndFriendId(@Param("userId") Long userId, @Param("friendId") Long friendId, @Param("stIdx") long stIdx, @Param("size") long size);
 
-    @Update("update bj_private_message set status = 3 where send_id = #{sendId} and recv_id = #{recvId} and status = 1 ")
-    int readedMessage(@Param("sendId") Long sendId, @Param("recvId") Long recvId);
+    @Update("update bj_private_message set status = #{status} where send_id = #{sendId} and recv_id = #{recvId} and status = 1 ")
+    int updateMessageStatus(@Param("status") Integer status, @Param("sendId") Long sendId, @Param("recvId") Long recvId);
 
     @Update("update bj_private_message set status = #{status} where id = #{messageId}")
     int updateMessageStatusById(@Param("status") Integer status, @Param("messageId") Long messageId);
 
-    @Select({"<script> " +
-            "select id as id, send_id as sendId, recv_id as recvId, content as content, type as type, status as status, send_time as sendTime " +
-            "from bj_private_message where id = #{messageId} " +
-            "</script>"})
-    PrivateMessageVO getPrivateMessageById(@Param("messageId") Long messageId);
+    @Select("select id from bj_private_message where send_id = #{userId} and recv_id = #{friendId} order by id desc limit 1 ")
+    Long getMaxReadedId(@Param("userId") Long userId, @Param("friendId") Long friendId);
 }

@@ -1,7 +1,5 @@
 package com.djj.bj.server.application.netty.processor.impl;
 
-import com.djj.bj.server.application.netty.cache.UserChannelCtxCache;
-import com.djj.bj.server.application.netty.processor.MessageProcessor;
 import com.djj.bj.common.io.constants.Constants;
 import com.djj.bj.common.io.enums.ResponseType;
 import com.djj.bj.common.io.enums.SystemInfoType;
@@ -10,6 +8,8 @@ import com.djj.bj.common.io.model.SendMessage;
 import com.djj.bj.common.io.model.SendResult;
 import com.djj.bj.common.io.model.UserInfo;
 import com.djj.bj.common.mq.MessageSenderService;
+import com.djj.bj.server.application.netty.cache.UserChannelCtxCache;
+import com.djj.bj.server.application.netty.processor.MessageProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * @author jj_D
  * @version 1.0
  * @projectName Bonjour
- * @package com.djj.bj.application.netty.processor.impl
+ * @package com.djj.bj.server.application.netty.processor.impl
  * @className PrivateMessageProcessor
  * @date 2025/7/7 16:40
  */

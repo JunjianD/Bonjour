@@ -186,7 +186,7 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
         sendMessage.setReturnResult(false);
         client.sendPrivateMessage(sendMessage);
         PrivateMessageThreadPoolUtils.execute(() -> {
-            privateMessageDomainService.readedMessage(friendId, session.getUserId());
+            privateMessageDomainService.updateMessageStatus(MessageStatus.READED.getCode(), friendId, session.getUserId());
         });
         logger.info("PrivateMessageServiceImpl.readedMessage | 消息已读，接收方id:{},发送方id:{}", session.getUserId(), friendId);
     }
@@ -230,5 +230,18 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
             client.sendPrivateMessage(sendMessage);
             logger.info("PrivateMessageServiceImpl.withdrawMessage | 撤回私聊消息，发送id:{},接收id:{}，内容:{}", privateMessage.getSendId(), privateMessage.getRecvId(), privateMessage.getContent());
         });
+    }
+
+    @Override
+    public Long getMaxReadedId(Long friendId) {
+        UserSession session = SessionContext.getUserSession();
+        if (session == null) {
+            throw new BJException(HttpCode.PARAMS_ERROR);
+        }
+        Long maxReadedId = privateMessageDomainService.getMaxReadedId(session.getUserId(), friendId);
+        if (maxReadedId == null) {
+            maxReadedId = -1L;
+        }
+        return maxReadedId;
     }
 }

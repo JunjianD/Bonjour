@@ -88,11 +88,12 @@ public interface PrivateMessageDomainService extends IService<PrivateMessage> {
     /**
      * 将指定用户与好友的消息更新为已读状态
      *
+     * @param status 新状态
      * @param sendId 发送者ID
      * @param recvId 接收者ID
      * @return 更新的记录数
      */
-    int readedMessage(Long sendId, Long recvId);
+    int updateMessageStatus(Integer status, Long sendId, Long recvId);
 
     /**
      * 根据id修改状态
@@ -111,4 +112,12 @@ public interface PrivateMessageDomainService extends IService<PrivateMessage> {
      */
     PrivateMessageVO getPrivateMessageById(Long messageId);
 
+    /**
+     * 获取用户与好友之间已读的最大消息ID
+     *
+     * @param userId   用户ID
+     * @param friendId 好友ID
+     * @return 已读的最大消息ID
+     */
+    Long getMaxReadedId(Long userId, Long friendId);
 }

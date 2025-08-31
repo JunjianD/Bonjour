@@ -39,8 +39,8 @@ public class PrivateMessageController {
     @Operation(summary = "发送消息", description = "发送私聊消息", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<Long> sendMessage(@Valid @RequestBody PrivateMessageDTO dto) {
-        return ResponseMessageFactory.getSuccessResponseMessage(privateMessageService.sendMessage(dto));
+    public ResponseMessage<String> sendMessage(@Valid @RequestBody PrivateMessageDTO dto) {
+        return ResponseMessageFactory.getSuccessResponseLongMessage(privateMessageService.sendMessage(dto));
     }
 
     @PostMapping("/pullUnreadMessage")
@@ -86,5 +86,13 @@ public class PrivateMessageController {
     public ResponseMessage<Long> withdrawMessage(@NotNull(message = "消息id不能为空") @PathVariable("id") Long id) {
         privateMessageService.withdrawMessage(id);
         return ResponseMessageFactory.getSuccessResponseMessage();
+    }
+
+    @GetMapping("/maxReadedId")
+    @Operation(summary = "获取最大已读消息的id", description = "获取某个会话中已读消息的最大id", parameters = {
+            @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
+    })
+    public ResponseMessage<String> getMaxReadedId(@RequestParam(value = "friendId") Long friendId) {
+        return ResponseMessageFactory.getSuccessResponseLongMessage(privateMessageService.getMaxReadedId(friendId));
     }
 }

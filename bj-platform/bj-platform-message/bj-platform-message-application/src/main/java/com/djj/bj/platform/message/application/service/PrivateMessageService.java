@@ -77,4 +77,6 @@ public interface PrivateMessageService {
      * @param id 消息ID
      */
     void withdrawMessage(Long id);
+
+    Long getMaxReadedId(Long friendId);
 }

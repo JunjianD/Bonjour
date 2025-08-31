@@ -90,8 +90,8 @@ public class PrivateMessageDomainServiceImpl extends ServiceImpl<PrivateMessageR
     }
 
     @Override
-    public int readedMessage(Long sendId, Long recvId) {
-        return baseMapper.readedMessage(sendId, recvId);
+    public int updateMessageStatus(Integer status, Long sendId, Long recvId) {
+        return baseMapper.updateMessageStatus(status, sendId, recvId);
     }
 
     @Override
@@ -102,5 +102,10 @@ public class PrivateMessageDomainServiceImpl extends ServiceImpl<PrivateMessageR
     @Override
     public PrivateMessageVO getPrivateMessageById(Long messageId) {
         return baseMapper.getPrivateMessageById(messageId);
+    }
+
+    @Override
+    public Long getMaxReadedId(Long userId, Long friendId) {
+        return baseMapper.getMaxReadedId(userId, friendId);
     }
 }
