@@ -104,7 +104,7 @@ public class FileServiceImpl implements FileService {
                 byte[] imageByte = ImageUtils.compressForScale(file.getBytes(), PlatformConstants.IMAGE_COMPRESS_SIZE);
                 fileName = minioService.upload(bucketName, imagePath, file.getOriginalFilename(), imageByte, file.getContentType());
                 if (StringUtils.isEmpty(fileName)) {
-                    throw new BJException(HttpCode.PROGRAM_ERROR, "图片上传失败");
+                    throw new BJException(HttpCode.PROGRAM_ERROR, "缩略图片上传失败");
                 }
             }
             vo.setThumbUrl(getFileUrl(FileType.IMAGE, fileName));
