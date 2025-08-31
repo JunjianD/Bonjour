@@ -32,7 +32,11 @@ public class SnowFlakeFactory {
     /**
      * 缓存SnowFlake实例
      */
-    private static ConcurrentMap<String,SnowFlake> snowFlakesCache = new ConcurrentHashMap<>(4);
+    private static final ConcurrentMap<String, SnowFlake> snowFlakesCache = new ConcurrentHashMap<>(16);
+
+    // 禁止实例化
+    private SnowFlakeFactory() {
+    }
 
     /**
      * 获取一个新的SnowFlake实例
@@ -60,12 +64,13 @@ public class SnowFlakeFactory {
      * @return 缓存中的默认SnowFlake实例
      */
     public static SnowFlake getSnowFlakeFromCache() {
-        SnowFlake snowFlake = snowFlakesCache.get(DEFAULT_SNOW_FLAKE);
-        if (snowFlake == null) {
-            snowFlake = new SnowFlake(DEFAULT_DATACENTER_ID, DEFAULT_MACHINE_ID);
-            snowFlakesCache.put(DEFAULT_SNOW_FLAKE, snowFlake);
-        }
-        return snowFlake;
+//        SnowFlake snowFlake = snowFlakesCache.get(DEFAULT_SNOW_FLAKE);
+//        if (snowFlake == null) {
+//            snowFlake = new SnowFlake(DEFAULT_DATACENTER_ID, DEFAULT_MACHINE_ID);
+//            snowFlakesCache.put(DEFAULT_SNOW_FLAKE, snowFlake);
+//        }
+//        return snowFlake;
+        return snowFlakesCache.computeIfAbsent(DEFAULT_SNOW_FLAKE, key -> new SnowFlake(DEFAULT_DATACENTER_ID, DEFAULT_MACHINE_ID));
     }
 
     /**
@@ -83,11 +88,12 @@ public class SnowFlakeFactory {
             throw new IllegalArgumentException("machineId can't be greater than MAX_MACHINE_NUM or less than 0, got: " + machineId);
         }
         String key = DEFAULT_SNOW_FLAKE.concat("_").concat(String.valueOf(dataCenterId)).concat("_").concat(String.valueOf(machineId));
-        SnowFlake snowFlake = snowFlakesCache.get(key);
-        if (snowFlake == null) {
-            snowFlake = new SnowFlake(dataCenterId, machineId);
-            snowFlakesCache.put(key, snowFlake);
-        }
-        return snowFlake;
+//        SnowFlake snowFlake = snowFlakesCache.get(key);
+//        if (snowFlake == null) {
+//            snowFlake = new SnowFlake(dataCenterId, machineId);
+//            snowFlakesCache.put(key, snowFlake);
+//        }
+//        return snowFlake;
+        return snowFlakesCache.computeIfAbsent(key, key1 -> new SnowFlake(dataCenterId, machineId));
     }
 }
