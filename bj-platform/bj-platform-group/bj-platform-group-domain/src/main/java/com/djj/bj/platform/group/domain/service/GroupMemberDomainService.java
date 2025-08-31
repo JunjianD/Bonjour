@@ -118,4 +118,11 @@ public interface GroupMemberDomainService extends IService<GroupMember> {
      * @return 是否更新成功
      */
     boolean updateHeadImgByUserId(String headImg, Long userId);
+
+    /**
+     * 保存群成员，使用事务模式
+     *
+     * @param groupMember 群成员实体
+     */
+    void saveInTransactionMode(GroupMember groupMember);
 }

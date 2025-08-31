@@ -16,6 +16,7 @@ import com.djj.bj.platform.group.domain.service.GroupMemberDomainService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class GroupMemberDomainServiceImpl extends ServiceImpl<GroupMemberReposit
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean saveGroupMemberList(List<GroupMember> groupMemberList) {
         if (CollectionUtil.isEmpty(groupMemberList)) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -50,6 +52,7 @@ public class GroupMemberDomainServiceImpl extends ServiceImpl<GroupMemberReposit
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateGroupMember(GroupMember groupMember) {
         if (groupMember == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -58,6 +61,7 @@ public class GroupMemberDomainServiceImpl extends ServiceImpl<GroupMemberReposit
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean removeMemberByGroupId(Long groupId) {
         if (groupId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -69,6 +73,7 @@ public class GroupMemberDomainServiceImpl extends ServiceImpl<GroupMemberReposit
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean removeMember(Long userId, Long groupId) {
         if (userId == null || groupId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -81,6 +86,7 @@ public class GroupMemberDomainServiceImpl extends ServiceImpl<GroupMemberReposit
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public GroupMember getGroupMemberByUserIdAndGroupId(Long userId, Long groupId) {
         if (userId == null || groupId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -93,6 +99,7 @@ public class GroupMemberDomainServiceImpl extends ServiceImpl<GroupMemberReposit
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<GroupMember> getGroupMemberListByGroupId(Long groupId) {
         LambdaQueryWrapper<GroupMember> memberWrapper = Wrappers.lambdaQuery();
         memberWrapper.eq(GroupMember::getGroupId, groupId)
@@ -129,5 +136,11 @@ public class GroupMemberDomainServiceImpl extends ServiceImpl<GroupMemberReposit
     @Override
     public boolean updateHeadImgByUserId(String headImg, Long userId) {
         return baseMapper.updateHeadImgByUserId(headImg, userId) > 0;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveInTransactionMode(GroupMember groupMember) {
+        this.save(groupMember);
     }
 }

@@ -34,16 +34,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -58,7 +51,7 @@ import java.util.stream.Collectors;
  * @date 2025/8/4 08:41
  */
 @Service
-@CacheConfig(cacheNames = Constants.CACHE_GROUP_INFO)
+//@CacheConfig(cacheNames = Constants.CACHE_GROUP_INFO)
 public class GroupServiceImpl implements GroupService {
     private final Logger logger = LoggerFactory.getLogger(GroupServiceImpl.class);
 
@@ -87,7 +80,6 @@ public class GroupServiceImpl implements GroupService {
     private MessageEventSenderService messageEventSenderService;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public GroupVO createGroup(GroupVO vo) {
         if (vo == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -99,8 +91,7 @@ public class GroupServiceImpl implements GroupService {
         }
         vo = this.getGroupVO(groupDomainService.createGroup(vo, session.getUserId()), session, user);
         logger.info("GroupServiceImpl.createGroup | 创建群聊 | 群聊ID: {}, 群聊名称: {}", vo.getId(), vo.getName());
-        //TODO 发送异步事件
-        GroupEvent groupEvent = new GroupEvent(vo.getId(), user.getUserId(), PlatformConstants.GROUP_HANDLER_CREATE, this.getTopicEvent());
+        GroupEvent groupEvent = new GroupEvent(vo.getId(), user.getUserId(), PlatformConstants.GROUP_HANDLER_CREATE, this.getTopicEvent(), Collections.emptyList());
         messageEventSenderService.send(groupEvent);
         return vo;
     }
@@ -115,16 +106,13 @@ public class GroupServiceImpl implements GroupService {
         groupMember.setAliasName(StringUtils.isEmpty(vo.getAliasName()) ? session.getNickName() : vo.getAliasName());
         groupMember.setRemark(vo.getRemark());
         groupMember.setCreatedTime(new Date());
-        groupMemberDomainService.save(groupMember);
-
+        groupMemberDomainService.saveInTransactionMode(groupMember);
         vo.setAliasName(groupMember.getAliasName());
         vo.setRemark(groupMember.getRemark());
         return vo;
     }
 
     @Override
-    @CacheEvict(key = "#vo.getId()")
-    @Transactional(rollbackFor = Exception.class)
     public GroupVO modifyGroup(GroupVO vo) {
         if (vo == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -140,21 +128,19 @@ public class GroupServiceImpl implements GroupService {
         groupMember.setRemark(vo.getRemark());
         if (groupMemberDomainService.updateGroupMember(groupMember)) {
             logger.info("GroupServiceImpl.modifyGroup | 修改群聊 | 群聊ID: {}, 群聊名称: {}", vo.getId(), vo.getName());
-            //TODO 发送异步事件
-            GroupEvent groupEvent = new GroupEvent(vo.getId(), session.getUserId(), PlatformConstants.GROUP_HANDLER_MODIFY, this.getTopicEvent());
+            GroupEvent groupEvent = new GroupEvent(vo.getId(), session.getUserId(), PlatformConstants.GROUP_HANDLER_MODIFY, this.getTopicEvent(), Collections.emptyList());
             messageEventSenderService.send(groupEvent);
         }
         return vo;
     }
 
     @Override
-    @CacheEvict(key = "#groupId")
-    @Transactional(rollbackFor = Exception.class)
     public void deleteGroup(Long groupId) {
         if (groupId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
         }
         UserSession session = SessionContext.getUserSession();
+        List<Long> userIds = this.getUserIdsByGroupId(groupId);
         //标记删除群组
         boolean result = groupDomainService.deleteGroup(groupId, session.getUserId());
         //群组标记删除成功
@@ -162,8 +148,7 @@ public class GroupServiceImpl implements GroupService {
             //删除群成员
             groupMemberDomainService.removeMemberByGroupId(groupId);
             logger.info("GroupServiceImpl.deleteGroup | 删除群聊 | 群聊ID: {}", groupId);
-            //TODO 发送异步事件
-            GroupEvent groupEvent = new GroupEvent(groupId, session.getUserId(), PlatformConstants.GROUP_HANDLER_DELETE, this.getTopicEvent());
+            GroupEvent groupEvent = new GroupEvent(groupId, session.getUserId(), PlatformConstants.GROUP_HANDLER_DELETE, this.getTopicEvent(), userIds);
             messageEventSenderService.send(groupEvent);
         } else {
             logger.info("GroupServiceImpl.deleteGroup | 删除群聊失败 | 群聊ID: {}", groupId);
@@ -171,7 +156,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void quitGroup(Long groupId) {
         if (groupId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -183,14 +167,13 @@ public class GroupServiceImpl implements GroupService {
         }
         if (groupMemberDomainService.removeMember(session.getUserId(), groupId)) {
             logger.info("GroupServiceImpl.quitGroup | 退群成功 | 用户ID: {}, 群聊ID: {}", session.getUserId(), groupId);
-            //TODO 发送异步事件
-            GroupEvent groupEvent = new GroupEvent(groupId, session.getUserId(), PlatformConstants.GROUP_HANDLER_QUIT, this.getTopicEvent());
+
+            GroupEvent groupEvent = new GroupEvent(groupId, session.getUserId(), PlatformConstants.GROUP_HANDLER_QUIT, this.getTopicEvent(), Collections.emptyList());
             messageEventSenderService.send(groupEvent);
         }
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void kickGroup(Long groupId, Long userId) {
         if (groupId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -201,8 +184,8 @@ public class GroupServiceImpl implements GroupService {
         }
         if (groupMemberDomainService.removeMember(userId, groupId)) {
             logger.info("GroupServiceImpl.kickGroup | 群主踢人成功 | 群主ID: {}, 被踢用户ID: {}, 群聊ID: {}", session.getUserId(), userId, groupId);
-            //TODO 发送异步事件
-            GroupEvent groupEvent = new GroupEvent(groupId, session.getUserId(), PlatformConstants.GROUP_HANDLER_KICK, this.getTopicEvent());
+
+            GroupEvent groupEvent = new GroupEvent(groupId, userId, PlatformConstants.GROUP_HANDLER_KICK, this.getTopicEvent(), Collections.emptyList());
             messageEventSenderService.send(groupEvent);
         }
     }
@@ -227,9 +210,8 @@ public class GroupServiceImpl implements GroupService {
         if (StrUtil.isEmpty(groupName)) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "群聊不存在");
         }
-        //获取群组现有群成员
+        //获取群组现有群成员,去掉已经移除群的
         List<GroupMember> members = groupMemberDomainService.getGroupMemberListByGroupId(vo.getGroupId());
-        //去掉已经移除群的
         long size = CollectionUtil.isEmpty(members) ? 0 : members.size();
         //一个群最多500人
         if (vo.getFriendIds().size() + size > Constants.MAX_GROUP_MEMBER_COUNT) {
@@ -237,42 +219,51 @@ public class GroupServiceImpl implements GroupService {
         }
         UserSession session = SessionContext.getUserSession();
         //获取好友数据
-        List<Friend> friendList = friendDubboService.getFriendByUserId(session.getUserId());
-        if (friendList == null) {
-            friendList = Collections.emptyList();
+        List<Friend> finalFriendList = friendDubboService.getFriendByUserId(session.getUserId());
+        if (finalFriendList == null) {
+            finalFriendList = Collections.emptyList();
         }
-        List<Friend> finalFriendList = friendList;
-        List<Friend> userFriendList = vo.getFriendIds().stream().map(id -> finalFriendList.stream().filter(f -> f.getFriendId().equals(id)).findFirst().get()).collect(Collectors.toList());
-        if (finalFriendList.size() != vo.getFriendIds().size()) {
+        Map<Long, Friend> finalFriendMap = finalFriendList.stream().collect(Collectors.toMap(Friend::getFriendId, f -> f));
+        List<Friend> userFriendList = vo.getFriendIds().stream()
+                .map(finalFriendMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+        if (userFriendList.size() != vo.getFriendIds().size()) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "部分用户不是您的好友，邀请失败");
         }
         //保存或者更新成功
         if (groupMemberDomainService.saveGroupMemberList(this.getGroupMemberList(vo, groupName, members, userFriendList))) {
             logger.info("GroupServiceImpl.invite | 邀请好友进群 | 群聊ID: {}, 群聊名称: {}, 被邀请用户ID: {}", vo.getGroupId(), groupName, vo.getFriendIds());
-            //TODO 发送异步事件
-            GroupEvent groupEvent = new GroupEvent(vo.getGroupId(), session.getUserId(), PlatformConstants.GROUP_HANDLER_INVITE, this.getTopicEvent());
-            messageEventSenderService.send(groupEvent);
+
+            vo.getFriendIds().forEach(id -> {
+                GroupEvent groupEvent = new GroupEvent(vo.getGroupId(), id, PlatformConstants.GROUP_HANDLER_INVITE, this.getTopicEvent(), Collections.emptyList());
+                messageEventSenderService.send(groupEvent);
+            });
         }
     }
 
     private List<GroupMember> getGroupMemberList(GroupInviteVO vo, String groupName, List<GroupMember> members, List<Friend> userFriendList) {
-        return userFriendList.stream().map(f -> {
-            Optional<GroupMember> optional = members.stream().filter(m -> m.getUserId().equals(f.getFriendId())).findFirst();
-            GroupMember groupMember = optional.orElseGet(GroupMember::new);
-            groupMember.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
-            groupMember.setGroupId(vo.getGroupId());
-            groupMember.setUserId(f.getFriendId());
-            groupMember.setAliasName(f.getFriendNickName());
-            groupMember.setRemark(groupName);
-            groupMember.setHeadImage(f.getFriendHeadImage());
-            groupMember.setCreatedTime(new Date());
-            groupMember.setQuit(false);
-            return groupMember;
-        }).toList();
+        Set<Long> existingMemberIds = members.stream()
+                .map(GroupMember::getUserId)
+                .collect(Collectors.toSet());
+        Date now = new Date();
+        return userFriendList.stream()
+                .filter(friend -> !existingMemberIds.contains(friend.getFriendId()))
+                .map(friend -> {
+                    GroupMember groupMember = new GroupMember();
+                    groupMember.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
+                    groupMember.setGroupId(vo.getGroupId());
+                    groupMember.setUserId(friend.getFriendId());
+                    groupMember.setCreatedTime(now);
+                    groupMember.setQuit(false);
+                    groupMember.setAliasName(friend.getFriendNickName());
+                    groupMember.setRemark(groupName);
+                    groupMember.setHeadImage(friend.getFriendHeadImage());
+                    return groupMember;
+                }).toList();
     }
 
     @Override
-    @Cacheable(key = "#groupId")
     public Group getById(Long groupId) {
         if (groupId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);

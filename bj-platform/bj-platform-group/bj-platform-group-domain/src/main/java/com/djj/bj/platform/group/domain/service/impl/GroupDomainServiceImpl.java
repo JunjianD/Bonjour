@@ -16,6 +16,7 @@ import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,7 @@ public class GroupDomainServiceImpl extends ServiceImpl<GroupRepository, Group> 
     private GroupMemberRepository groupMemberRepository;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public GroupVO createGroup(GroupVO vo, Long userId) {
         if (vo == null || userId == null) {
             throw new BJException(HttpCode.PROGRAM_ERROR);
@@ -46,7 +48,7 @@ public class GroupDomainServiceImpl extends ServiceImpl<GroupRepository, Group> 
         vo.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
         Group group = BeanUtils.copyProperties(vo, Group.class);
         // 设置群主id
-        group.setOwnerId(userId);
+//        group.setOwnerId(userId);   // 已经对应到vo的ownerId
         group.setCreatedTime(new Date());
         int count = baseMapper.insert(group);
         if (count <= 0) {
@@ -57,6 +59,7 @@ public class GroupDomainServiceImpl extends ServiceImpl<GroupRepository, Group> 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public GroupVO modifyGroup(GroupVO vo, Long userId) {
         if (vo == null || userId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -65,7 +68,7 @@ public class GroupDomainServiceImpl extends ServiceImpl<GroupRepository, Group> 
         if (group == null) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "群不存在");
         }
-        //只有群主才懂更新群信息
+        //只有群主才能更新群信息
         if (group.getOwnerId().equals(userId)) {
             group = BeanUtils.copyProperties(vo, Group.class);
             this.updateById(group);
@@ -75,6 +78,7 @@ public class GroupDomainServiceImpl extends ServiceImpl<GroupRepository, Group> 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteGroup(Long groupId, Long userId) {
         if (groupId == null || userId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -91,6 +95,7 @@ public class GroupDomainServiceImpl extends ServiceImpl<GroupRepository, Group> 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean quitGroup(Long groupId, Long userId) {
         if (groupId == null || userId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -106,6 +111,7 @@ public class GroupDomainServiceImpl extends ServiceImpl<GroupRepository, Group> 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean kickGroup(Long groupId, Long kickUserId, Long userId) {
         if (groupId == null || kickUserId == null || userId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);

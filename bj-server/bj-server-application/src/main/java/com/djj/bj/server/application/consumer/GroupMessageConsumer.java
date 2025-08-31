@@ -1,11 +1,11 @@
 package com.djj.bj.server.application.consumer;
 
 import cn.hutool.core.util.StrUtil;
-import com.djj.bj.server.application.netty.processor.MessageProcessor;
-import com.djj.bj.server.application.netty.processor.factory.ProcessorFactory;
 import com.djj.bj.common.io.constants.Constants;
 import com.djj.bj.common.io.enums.SystemInfoType;
 import com.djj.bj.common.io.model.ReceiveMessage;
+import com.djj.bj.server.application.netty.processor.MessageProcessor;
+import com.djj.bj.server.application.netty.processor.factory.ProcessorFactory;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
@@ -37,12 +37,12 @@ public class GroupMessageConsumer extends BasicMessageConsumer implements Rocket
 
     @Override
     public void onMessage(String msg) {
-        if(StrUtil.isEmpty(msg)) {
+        if (StrUtil.isEmpty(msg)) {
             logger.warn("GroupMessageConsumer.onMessage | 消息内容为空");
             return;
         }
         ReceiveMessage receiveMessage = this.getReceiveMessage(msg);
-        if(receiveMessage == null) {
+        if (receiveMessage == null) {
             logger.warn("GroupMessageConsumer.onMessage | 接收到的消息内容无法转换为ReceiveMessage对象");
             return;
         }
@@ -52,10 +52,10 @@ public class GroupMessageConsumer extends BasicMessageConsumer implements Rocket
 
     @Override
     public void prepareStart(DefaultMQPushConsumer defaultMQPushConsumer) {
-        try{
-            String topic = String.join(Constants.MESSAGE_KEY_SPLIT,Constants.MESSAGE_GROUP_QUEUE, String.valueOf(serverId));
+        try {
+            String topic = String.join(Constants.MESSAGE_KEY_SPLIT, Constants.MESSAGE_GROUP_QUEUE, String.valueOf(serverId));
             defaultMQPushConsumer.subscribe(topic, "*");
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error("PrivateMessageConsumer.prepareStart | 发生异常: {}", e.getMessage());
         }
     }

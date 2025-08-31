@@ -25,13 +25,13 @@ public interface GroupMemberRepository extends BaseMapper<GroupMember> {
             "remark as remark from bj_group_member where group_id = #{groupId} and quit = 0")
     List<GroupMemberVO> getGroupMemberVoListByGroupId(@Param("groupId") Long groupId);
 
-    @Select("select user_id from bj_group_member where where group_id = #{groupId} and quit = 0 ")
+    @Select("select user_id from bj_group_member where group_id = #{groupId} and quit = 0 ")
     List<Long> getUserIdsByGroupId(@Param("groupId") Long groupId);
 
-    @Select("select alias_name as aliasName, quit as quit, created_time as createdTime, group_id as groupId from bj_group_member where group_id = #{groupId} and user_id = #{userId}")
+    @Select("select alias_name as aliasName, quit as quit, created_time as createTime, group_id as groupId from bj_group_member where group_id = #{groupId} and user_id = #{userId} and quit = 0 ")
     GroupMemberSimpleVO getGroupMemberSimpleVO(@Param("groupId") Long groupId, @Param("userId") Long userId);
 
-    @Select("select alias_name as aliasName, quit as quit, created_time as createdTime, group_id as groupId from bj_group_member where user_id = #{userId} and quit = 0 ")
+    @Select("select alias_name as aliasName, quit as quit, created_time as createTime, group_id as groupId from bj_group_member where user_id = #{userId} and quit = 0 ")
     List<GroupMemberSimpleVO> getGroupMemberSimpleVOList(@Param("userId") Long userId);
 
     @Update("update bj_group_member set head_image = #{headImg} where user_id = #{userId}")

@@ -39,8 +39,8 @@ public class GroupMessageController {
     @Operation(summary = "发送群聊消息", description = "发送群聊消息", parameters = {
             @Parameter(name = PlatformConstants.ACCESS_TOKEN, description = "访问令牌", in = ParameterIn.HEADER, schema = @Schema(type = "string"))
     })
-    public ResponseMessage<Long> sendMessage(@Valid @RequestBody GroupMessageDTO dto) {
-        return ResponseMessageFactory.getSuccessResponseMessage(groupMessageService.sendMessage(dto));
+    public ResponseMessage<String> sendMessage(@Valid @RequestBody GroupMessageDTO dto) {
+        return ResponseMessageFactory.getSuccessResponseLongMessage(groupMessageService.sendMessage(dto));
     }
 
     @PostMapping("/pullUnreadMessage")

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * 群组事件类
  *
@@ -29,9 +31,15 @@ public class GroupEvent extends BaseEvent {
      */
     private String handler;
 
-    public GroupEvent(Long id, Long userId, String handler, String destination) {
+    /**
+     * 成员id列表, 用于批量操作，只有解散群组时使用
+     */
+    private List<Long> memberIdList;
+
+    public GroupEvent(Long id, Long userId, String handler, String destination, List<Long> memberIdList) {
         super(id, destination);
         this.userId = userId;
         this.handler = handler;
+        this.memberIdList = memberIdList;
     }
 }
