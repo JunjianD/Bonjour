@@ -415,17 +415,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <!--    <distributionManagement>-->
-    <!--        <repository>-->
-    <!--            &lt;!&ndash;这里的id与settings.xml中的servers节点配置的用户ID一致，这样才能使用配置的用户去上传到maven私有仓库 &ndash;&gt;-->
-    <!--            <id>djj</id>-->
-    <!--            <url>http://117.72.85.211:8081/repository/maven-releases/</url>-->
-    <!--        </repository>-->
-    <!--        <snapshotRepository>-->
-    <!--            &lt;!&ndash;这里的id与settings.xml中的servers节点配置的用户ID一致，这样才能使用配置的用户去上传到maven私有仓库 &ndash;&gt;-->
-    <!--            <id>djj</id>-->
-    <!--            <url>http://117.72.85.211:8081/repository/maven-snapshots/</url>-->
-    <!--        </snapshotRepository>-->
-    <!--    </distributionManagement>-->
 </project>
