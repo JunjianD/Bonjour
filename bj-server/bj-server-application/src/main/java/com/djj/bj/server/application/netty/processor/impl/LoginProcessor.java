@@ -2,8 +2,6 @@ package com.djj.bj.server.application.netty.processor.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSON;
-import com.djj.bj.server.application.netty.cache.UserChannelCtxCache;
-import com.djj.bj.server.application.netty.processor.MessageProcessor;
 import com.djj.bj.common.cache.distribute.DistributeCacheService;
 import com.djj.bj.common.io.constants.Constants;
 import com.djj.bj.common.io.enums.SystemInfoType;
@@ -11,6 +9,8 @@ import com.djj.bj.common.io.jwt.JwtUtils;
 import com.djj.bj.common.io.model.LoginInfo;
 import com.djj.bj.common.io.model.SendMessage;
 import com.djj.bj.common.io.model.SessionInfo;
+import com.djj.bj.server.application.netty.cache.UserChannelCtxCache;
+import com.djj.bj.server.application.netty.processor.MessageProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * @author jj_D
  * @version 1.0
  * @projectName Bonjour
- * @package com.djj.bj.application.netty.processor.impl
+ * @package com.djj.bj.server.application.netty.processor.impl
  * @className LoginProcessor
  * @date 2025/6/18 21:15
  */

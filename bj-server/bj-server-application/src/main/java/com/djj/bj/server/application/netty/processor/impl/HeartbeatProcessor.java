@@ -1,12 +1,12 @@
 package com.djj.bj.server.application.netty.processor.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.djj.bj.server.application.netty.processor.MessageProcessor;
 import com.djj.bj.common.cache.distribute.DistributeCacheService;
 import com.djj.bj.common.io.constants.Constants;
 import com.djj.bj.common.io.enums.SystemInfoType;
 import com.djj.bj.common.io.model.HeartbeatInfo;
 import com.djj.bj.common.io.model.SendMessage;
+import com.djj.bj.server.application.netty.processor.MessageProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * @author jj_D
  * @version 1.0
  * @projectName Bonjour
- * @package com.djj.bj.application.netty.processor.impl
+ * @package com.djj.bj.server.application.netty.processor.impl
  * @className HeartbeatProcessor
  * @date 2025/7/6 11:34
  */

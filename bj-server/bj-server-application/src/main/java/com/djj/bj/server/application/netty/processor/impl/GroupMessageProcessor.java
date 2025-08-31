@@ -31,7 +31,7 @@ import java.util.List;
  */
 @Component
 public class GroupMessageProcessor implements MessageProcessor<ReceiveMessage> {
-    private final Logger logger = LoggerFactory.getLogger(PrivateMessageProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(GroupMessageProcessor.class);
 
     @Resource
     private MessageSenderService messageSenderService;
