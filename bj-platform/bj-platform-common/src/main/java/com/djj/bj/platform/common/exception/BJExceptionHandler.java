@@ -32,7 +32,7 @@ public class BJExceptionHandler {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public ResponseMessage<String> handleException(Exception e) {
-        logger.error(e.getMessage());
+        logger.error(e.getMessage(), e);
         return ResponseMessageFactory.getErrorResponseMessage(HttpCode.PROGRAM_ERROR);
     }
 }
