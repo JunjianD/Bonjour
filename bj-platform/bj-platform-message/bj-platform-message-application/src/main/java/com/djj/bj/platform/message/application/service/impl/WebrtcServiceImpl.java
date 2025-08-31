@@ -83,7 +83,7 @@ public class WebrtcServiceImpl implements WebrtcService {
         this.removeWebrtcSession(session.getUserId(), uid);
         // 向对方所有终端推送取消通话信令
         PrivateMessageVO messageInfo = new PrivateMessageVO();
-        messageInfo.setType(MessageType.RTC_ACCEPT.getCode());
+        messageInfo.setType(MessageType.RTC_CANCEL.getCode());
         messageInfo.setRecvId(uid);
         messageInfo.setSendId(session.getUserId());
 
