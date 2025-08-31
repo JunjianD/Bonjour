@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -24,7 +26,9 @@ import java.util.Date;
 @Getter
 @Setter
 @Schema(description = "群成员简易信息（VO）")
-public class GroupMemberSimpleVO {
+public class GroupMemberSimpleVO implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -1988900433349910705L;
 
     @Schema(description = "群内昵称")
     private String aliasName;

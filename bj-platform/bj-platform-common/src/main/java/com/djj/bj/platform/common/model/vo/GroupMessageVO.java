@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +29,9 @@ import java.util.List;
 @Getter
 @Setter
 @Schema(description = "群消息值对象（VO）")
-public class GroupMessageVO {
+public class GroupMessageVO implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -4342623521158057787L;
 
     @Schema(description = "消息ID")
     @JsonSerialize(using = ToStringSerializer.class)
