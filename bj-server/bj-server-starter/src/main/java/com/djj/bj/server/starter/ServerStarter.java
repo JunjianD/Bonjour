@@ -16,7 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @className ServerStarter
  * @date 2025/8/13 19:56
  */
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 @EnableScheduling
 @ComponentScan(basePackages = {"com.djj.bj"})
 @SpringBootApplication
