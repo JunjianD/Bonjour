@@ -1,7 +1,5 @@
 # Bonjour
 
----
-
 English | [中文](README_cn.md "查看中文版")
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
