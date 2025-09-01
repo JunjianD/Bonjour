@@ -4,6 +4,9 @@
 
 English | [中文](README_cn.md "查看中文版")
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Static Badge](https://img.shields.io/badge/Demo-Bonjour-blue.svg)](http://117.72.85.211:8898/ "Click to visit the online demo")
+
 ![Bonjour](docs/bonjour_logo.png)
 
 Bonjour is a distributed instant messaging system based on **JDK 21**, **Spring Boot 3**, and **Spring Cloud**, designed

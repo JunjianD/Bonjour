@@ -4,6 +4,9 @@
 
 [English](README.md "View English version") | 中文
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Static Badge](https://img.shields.io/badge/Bonjour-demo-blue.svg)](http://117.72.85.211:8898/ "点击访问在线演示")
+
 ![Bonjour](docs/bonjour_logo.png)
 
 Bonjour是一个基于JDK21，SpringBoot3，SpringCloud设计的前后端分离的分布式即时通讯系统
