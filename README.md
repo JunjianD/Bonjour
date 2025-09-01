@@ -8,8 +8,7 @@ English | [中文](README_cn.md "查看中文版")
 ![Bonjour](docs/bonjour_logo.png)
 
 Bonjour is a distributed instant messaging system built on **JDK 21**, leveraging **Spring Boot 3** and **Spring Cloud
-**.
-It adopts a front-end/back-end decoupled architecture, offering high scalability and flexible deployment
+**. It adopts a front-end/back-end decoupled architecture, offering high scalability and flexible deployment
 capabilities
 
 ## Features
