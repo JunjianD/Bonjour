@@ -7,7 +7,7 @@
 
 ![Bonjour](docs/bonjour_logo.png)
 
-Bonjour是一个基于JDK21，SpringBoot3，SpringCloud设计的前后端分离的分布式即时通讯系统
+Bonjour 是一套基于 **JDK 21**，结合 **Spring Boot 3** 与 **Spring Cloud** 实现的分布式即时通讯系统，采用前后端分离架构，具备高扩展性与灵活部署能力
 
 ## 特点
 
