@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -26,6 +27,7 @@ import java.util.Map;
  * @date 2025/7/15 15:07
  */
 @Component
+@RefreshScope
 public class XssRuleChainService extends BaseRuleChainService {
     private static final Logger logger = LoggerFactory.getLogger(XssRuleChainService.class);
 

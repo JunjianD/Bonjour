@@ -1,0 +1,203 @@
+#这是配置服务的端口
+server:
+  port: 10002
+  servlet:
+    context-path: /user-server
+#配置项目的数据源
+spring:
+  config:
+    import:
+      - optional:nacos:bj-platform-user.yaml?refreshEnabled=true&group=DEFAULT_GROUP
+  application:
+    name: bj-platform-user
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    pathmatch:
+      #      matching-strategy: ant_path_matcher
+      matching-strategy: path_pattern_parser
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://222.186.48.169:3306/bj?useSSL=true&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+#    url: jdbc:mysql://localhost:3306/bj?useSSL=true&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+    username: root
+    password: qwe159159159
+    hikari:
+      minimum-idle: 4                  # 保证热连接
+      maximum-pool-size: 16            # 根据线上 QPS 调整
+      idle-timeout: 60000
+      max-lifetime: 1800000            # 30 min，防止 MySQL 8h 超时
+      connection-timeout: 5000         # 5 s 拿不到直接抛异常
+      validation-timeout: 3000
+      connection-test-query: SELECT 1
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  data:
+    redis:
+      address: redis://222.186.48.169:6379
+#      address: redis://localhost:6379
+      host: 222.186.48.169
+#      host: localhost
+      port: 6379
+      database: 0
+      lettuce:
+        pool:
+          enabled: true
+          max-active: 32
+          max-idle: 16
+          min-idle: 4
+          max-wait: 2000ms
+      password: qwe159159159
+  cloud:
+    nacos:
+      server-addr: 222.186.48.169:8848
+#      server-addr: localhost:8848
+      username: 'nacos'
+      password: 'qwe159159159'
+      discovery:
+        server-addr: 222.186.48.169:8848
+#        server-addr: localhost:8848
+        username: 'nacos'
+        password: 'qwe159159159'
+        enabled: true
+        namespace: bj
+        group: BJ-GROUP
+
+dubbo:
+  application:
+    name: ${spring.application.name}
+    qos-port: 22222
+    logger: slf4j
+  scan:
+    #    base-packages: com.djj.bj.platform.user.application.dubbo
+    base-packages: com.djj.bj.platform.user
+  protocol:
+    name: dubbo
+    port: 20881
+    threads: 200
+  registry:
+    address: nacos://222.186.48.169:8848?namespace=bj&register-consumer-url=true
+#    address: nacos://localhost:8848?namespace=bj&register-consumer-url=true
+    register-mode: instance
+    username: nacos
+    password: qwe159159159
+    group: BJ-GROUP
+
+
+mybatis-plus:
+  configuration:
+    # 是否开启自动驼峰命名规则（camel case）映射，即从经典数据库列名 A_COLUMN（下划线命名） 到经典 Java 属性名 aColumn（驼峰命名） 的类似映射
+    map-underscore-to-camel-case: false
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # mapper
+  mapper-locations:
+    # *.xml的具体路径
+    - classpath*:mapper/*.xml
+
+minio:
+  endpoint: http://localhost:9000 #内网地址
+  public: http://222.186.48.169:9000  #外网访问地址
+  #  accessKey: 6eVRsvNgaFT8Kz8ltZ9E
+  #  secretKey: 4MHuhc4faJACk03fFIeBiFVBCv56DCv44S5WbVTi
+  accessKey: z8YqNZ4hHDDE2PAScpYF
+  secretKey: VFT0XsWQhVIWzmusfrFrycz9dwG0PrxskaKr5M96
+  bucketName: djj-bj
+  imagePath: image
+  filePath: file
+
+webrtc:
+  iceServers:
+    - urls: stun:stun.l.google.com:19302
+
+jwt:
+  accessToken:
+    expireIn: 1800 #半个小时
+    secret: bonjour_access
+  refreshToken:
+    expireIn: 604800 #7天
+    secret: bonjour_refresh
+
+rocketmq:
+  name-server: 222.186.48.169:9876
+#  name-server: localhost:9876
+  producer:
+    group: bj-plate-group
+
+
+distributed:
+  cache:
+    type: redis
+  lock:
+    type: redisson
+
+message:
+  mq:
+    type: rocketmq
+    event:
+      type: rocketmq
+
+redis:
+  arrange:
+    type: single # single or cluster
+
+bj:
+  rule:
+    authRule:
+      order: 10
+    xssRule:
+      enabled: true
+      order: 0
+    ipRule:
+      enabled: true
+      order: 1
+      windowsSize: 50
+      windowPeriod: 1000
+    pathRule:
+      enabled: true
+      order: 1
+      windowsSize: 50
+      windowPeriod: 1000
+
+#logging:
+#  pattern:
+#    console: "%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}){${LOG_LEVEL_COLOR:-%5p}} %clr(${PID:- }){magenta} %clr(---){faint} %clr(%esb(){APPLICATION_NAME}%esb{APPLICATION_GROUP}[%t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+
+
+#logging:
+#  charset:
+#    console: UTF-8
+#    file: UTF-8
+#
+#  pattern:
+#    console: "%clr(%d{${LOG_DATEFORMAT_PATTERN:yyyy-MM-dd'T'HH:mm:ss.SSSXXX}}){faint} \
+#%clr(${LOG_LEVEL_PATTERN:%5p}){} \
+#%clr(${PID:- }){magenta} \
+#%clr(---){faint} \
+#%clr(%esb(){APPLICATION_NAME}%esb{APPLICATION_GROUP}[%15.15t]){faint} \
+#%clr(%-40.40logger{39}){cyan} \
+#%clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+#
+#    file: "%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}} \
+#${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- \
+#%esb(){APPLICATION_NAME}%esb{APPLICATION_GROUP}[%t] \
+#${LOG_CORRELATION_PATTERN:-}%-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+#
+#  file:
+#    name: logs/app.log
+#    max-history: 7
+#    max-size: 10MB
+#    clean-history-on-start: false
+#    total-size-cap: 0
+#
+#  level:
+#    root: INFO
+#    org.apache.catalina.startup.DigesterFactory: ERROR
+#    org.apache.catalina.util.LifecycleBase: ERROR
+#    org.apache.coyote.http11.Http11NioProtocol: WARN
+#    org.apache.sshd.common.util.SecurityUtils: WARN
+#    org.apache.tomcat.util.net.NioSelectorPool: WARN
+#    org.eclipse.jetty.util.component.AbstractLifeCycle: ERROR
+#    org.hibernate.validator.internal.util.Version: WARN
+#    org.springframework.boot.actuate.endpoint.jmx: WARN

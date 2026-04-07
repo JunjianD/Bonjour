@@ -1,0 +1,86 @@
+server:
+  port: 12001
+  servlet:
+    context-path: /ai-server
+
+#配置项目的数据源
+spring:
+  config:
+    import:
+      - optional:nacos:bj-platform-user.yaml?refreshEnabled=true&group=DEFAULT_GROUP
+  application:
+    name: bj-ai
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    pathmatch:
+      #      matching-strategy: ant_path_matcher
+      matching-strategy: path_pattern_parser
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  cloud:
+    nacos:
+      server-addr: 222.186.48.169:8848
+      #      server-addr: localhost:8848
+      username: 'nacos'
+      password: 'qwe159159159'
+      discovery:
+        server-addr: 222.186.48.169:8848
+        #        server-addr: localhost:8848
+        username: 'nacos'
+        password: 'qwe159159159'
+        enabled: true
+        namespace: bj
+        group: BJ-GROUP
+      config:
+        file-extension: json
+
+dubbo:
+  application:
+    name: ${spring.application.name}
+    qos-port: 22300
+    logger: slf4j
+  scan:
+    #    base-packages: com.djj.bj.platform.user.application.dubbo
+    base-packages: com.djj.bj.ai
+  protocol:
+    name: dubbo
+    port: 20887
+    threads: 200
+  registry:
+    address: nacos://222.186.48.169:8848?namespace=bj&register-consumer-url=true
+    #    address: nacos://localhost:8848?namespace=bj&register-consumer-url=true
+    register-mode: instance
+    username: nacos
+    password: qwe159159159
+    group: BJ-GROUP
+
+bj-ai:
+  type: chatgpt
+  chatgpt:
+#    key: sk-JEB1U9tnjorHT8dH7aP2fSL5ZCTZ4ixRjAjD5gtwvbcI8Gks
+    key: sk-rfiugo5We0gPiXgyD6zGkDCzlDuqebQOeiTkZ1WUvE8P9py2
+    api: https://z.apiyihe.org/v1/chat/completions
+  chatglm:
+    key: xxxxxxx
+    api: xxxxxxxx
+  claude:
+    key: xxxxxxx
+    api: xxxxxxxx
+  tongyi:
+    key: xxxxxxx
+    api: xxxxxxx
+  palm:
+    key: xxxxxxx
+    api: xxxxxxx
+  xinghuo:
+    key: xxxxxxx
+    api: xxxxxxx
+  wenxin:
+    key: xxxxxxx
+    api: xxxxxxx
+  hunyuan:
+    key: xxxxxxx
+    api: xxxxxxx

@@ -1,6 +1,9 @@
 package com.djj.bj.platform.common.threadpool;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 群聊消息线程池工具类
@@ -14,11 +17,18 @@ import java.util.concurrent.*;
  */
 public class GroupMessageThreadPoolUtils {
     private static ThreadPoolExecutor THREAD_POOL_EXECUTOR = new ThreadPoolExecutor(
-            8,
-            16,
-            120,
+            64,
+            256,
+            60,
             TimeUnit.SECONDS,
-            new ArrayBlockingQueue<>(4096),
+            new ArrayBlockingQueue<>(2048),
+            new ThreadFactory() {
+                private final AtomicInteger count = new AtomicInteger(1);
+                @Override
+                public Thread newThread(@NonNull Runnable r) {
+                    return new Thread(r, "GroupMsg-Thread-" + count.getAndIncrement());
+                }
+            },
             new ThreadPoolExecutor.CallerRunsPolicy()
     );
 

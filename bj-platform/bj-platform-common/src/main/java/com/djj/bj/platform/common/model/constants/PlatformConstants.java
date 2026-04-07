@@ -291,6 +291,17 @@ public class PlatformConstants {
      */
     public static final String DEFAULT_DUBBO_VERSION = "1.0.0";
 
+    /**
+     * AI userId
+     */
+    public static final Long AI_USER_ID = 10000000001L;
+
+    /**
+     * AI username
+     */
+    public static final String AI_USER_NAME = "douhua";
+
+
     public static String getKey(String prefix, String key) {
         return prefix.concat(key);
     }

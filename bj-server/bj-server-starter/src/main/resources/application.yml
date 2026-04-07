@@ -1,0 +1,59 @@
+server:
+  port: 8877
+  id: 1
+  servlet:
+    context-path: /bj
+
+spring:
+  data:
+    redis:
+      address: redis://222.186.48.169:6379
+#      address: redis://localhost:6379
+      host: 222.186.48.169
+#      host: localhost
+      port: 6379
+      database: 0
+      lettuce:
+        pool:
+          enabled: true
+          max-active: 32
+          max-idle: 16
+          min-idle: 4
+          max-wait: 2000ms
+      password: qwe159159159
+
+websocket:
+  enable: true
+  port: 8878
+
+tcpsocket:
+  enable: false # 暂时不开启
+  port: 8879
+
+heartbeat:
+  count: 10
+
+jwt:
+  accessToken:
+    secret: bonjour_access
+
+rocketmq:
+  name-server: 222.186.48.169:9876
+#  name-server: localhost:9876
+  producer:
+    group: bj-server-group
+
+message:
+  mq:
+    type: rocketmq
+
+
+distributed:
+  cache:
+    type: redis
+  lock:
+    type: redisson
+
+redis:
+  arrange:
+    type: single # single or cluster

@@ -1,6 +1,9 @@
 package com.djj.bj.common.cache.threadpool;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 线程工具类
@@ -15,10 +18,17 @@ import java.util.concurrent.*;
 public class ThreadPoolUtils {
     private static ThreadPoolExecutor executor = new ThreadPoolExecutor(
             16,
-            16,
+            32,
             30,
             TimeUnit.SECONDS,
             new ArrayBlockingQueue<>(4096),
+            new ThreadFactory() {
+                private final AtomicInteger count = new AtomicInteger(1);
+                @Override
+                public Thread newThread(@NonNull Runnable r) {
+                    return new Thread(r, "CacheTask-Thread-" + count.getAndIncrement());
+                }
+            },
             new ThreadPoolExecutor.CallerRunsPolicy()
     );
 

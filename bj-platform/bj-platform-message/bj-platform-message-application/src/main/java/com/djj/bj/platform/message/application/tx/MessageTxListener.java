@@ -61,8 +61,8 @@ public class MessageTxListener implements RocketMQLocalTransactionListener {
         Boolean submitTransaction = Boolean.FALSE;
         switch (messageTxEvent.getMessageType()) {
             case PlatformConstants.TYPE_MESSAGE_PRIVATE ->
-                    privateMessageService.checkExists(messageTxEvent.getEventId());
-            case PlatformConstants.TYPE_MESSAGE_GROUP -> groupMessageService.checkExists(messageTxEvent.getEventId());
+                    submitTransaction = privateMessageService.checkExists(messageTxEvent.getEventId());
+            case PlatformConstants.TYPE_MESSAGE_GROUP -> submitTransaction = groupMessageService.checkExists(messageTxEvent.getEventId());
             default -> submitTransaction = privateMessageService.checkExists(messageTxEvent.getEventId());
         }
         return BooleanUtil.isTrue(submitTransaction) ? RocketMQLocalTransactionState.COMMIT : RocketMQLocalTransactionState.UNKNOWN;

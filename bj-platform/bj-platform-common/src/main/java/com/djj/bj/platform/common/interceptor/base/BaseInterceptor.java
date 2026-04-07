@@ -29,6 +29,6 @@ public abstract class BaseInterceptor implements HandlerInterceptor {
         if (CollectionUtil.isEmpty(ruleChainServices)) {
             return Collections.emptyList();
         }
-        return ruleChainServices.stream().sorted(Comparator.comparing(RuleChainService::getOrder)).collect(Collectors.toList());
+        return ruleChainServices.stream().sorted(Comparator.comparing(RuleChainService::getOrder)).toList();
     }
 }

@@ -21,6 +21,7 @@
         <module>bj-server</module>
         <module>bj-sdk</module>
         <module>bj-platform</module>
+        <module>bj-ai</module>
     </modules>
 
     <dependencyManagement>
@@ -415,4 +416,16 @@
             </plugin>
         </plugins>
     </build>
+
+
+    <distributionManagement>
+        <repository>
+            <id>doujiangji</id>
+            <url>http://222.186.48.169:8081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>doujiangji</id>
+            <url>http://222.186.48.169:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
  * @date 2025/7/21 20:47
  */
 @Component
+@RefreshScope
 public class PathRuleChainService extends BaseRuleChainService {
     private final Logger logger = LoggerFactory.getLogger(PathRuleChainService.class);
 
