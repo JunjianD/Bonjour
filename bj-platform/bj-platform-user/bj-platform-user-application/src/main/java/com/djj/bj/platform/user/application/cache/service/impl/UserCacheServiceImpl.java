@@ -50,9 +50,10 @@ public class UserCacheServiceImpl implements UserCacheService {
                 PlatformConstants.USER_UPDATE_CACHE_LOCK_KEY,
                 userId.toString()
         ));
+        boolean locked = false;
         try {
-            boolean isSuccess = lock.tryLock();
-            if (!isSuccess) {
+            locked = lock.tryLock();
+            if (!locked) {
                 logger.info("UserCacheServiceImpl.updateUserCache|线程{}获取分布式锁失败，无法更新缓存 userId:{}", Thread.currentThread().getName(), userId);
                 return;
             }
@@ -80,7 +81,9 @@ public class UserCacheServiceImpl implements UserCacheService {
         } catch (Exception e) {
             logger.error("UserCacheServiceImpl.updateUserCache|获取分布式锁异常，更新缓存失败 userId:{}", userId, e);
         } finally {
-            lock.unlock();
+            if (locked) {
+                lock.unlock();
+            }
         }
     }
 }

@@ -48,6 +48,10 @@ public class ChannelHandlerImpl extends SimpleChannelInboundHandler<SendMessage<
 
         AttributeKey<Integer> terminalAttr = AttributeKey.valueOf(Constants.TERMINAL_TYPE);
         Integer terminal = ctx.channel().attr(terminalAttr).get();
+        if (userId == null || terminal == null) {
+            logger.info("ChannelHandlerImpl.handlerRemoved: Anonymous channel disconnected: {}", ctx.channel().id().asLongText());
+            return;
+        }
 
         ChannelHandlerContext channelCtx = UserChannelCtxCache.getCtx(userId, terminal);
         // 防止异地登录误删
@@ -62,7 +66,8 @@ public class ChannelHandlerImpl extends SimpleChannelInboundHandler<SendMessage<
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("ChannelHandlerImpl.exceptionCaught: Exception occurred: {}", cause.getMessage());
+        logger.error("ChannelHandlerImpl.exceptionCaught: Exception occurred", cause);
+        ctx.close();
     }
 
     @Override

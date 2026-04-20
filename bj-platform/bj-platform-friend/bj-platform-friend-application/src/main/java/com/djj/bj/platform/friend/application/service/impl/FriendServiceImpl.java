@@ -1,6 +1,7 @@
 package com.djj.bj.platform.friend.application.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.BooleanUtil;
 import com.djj.bj.common.cache.distribute.DistributeCacheService;
 import com.djj.bj.platform.common.exception.BJException;
@@ -127,9 +128,11 @@ public class FriendServiceImpl implements FriendService {
         User friend = userDubboService.getUserById(friendId);
         Boolean[] results = domainService.bindFriend(userId, user, friendId, friend);
         if (BooleanUtil.isTrue(results[0])) {
+            this.evictFriendCache(userId, friendId);
             domainService.publishEvent(userId, friendId, PlatformConstants.FRIEND_HANDLER_BIND);
         }
         if (BooleanUtil.isTrue(results[1])) {
+            this.evictFriendCache(friendId, userId);
             domainService.publishEvent(friendId, userId, PlatformConstants.FRIEND_HANDLER_BIND);
         }
     }
@@ -145,9 +148,11 @@ public class FriendServiceImpl implements FriendService {
         }
         Boolean[] results = domainService.unbindFriend(userId, friendId);
         if (BooleanUtil.isTrue(results[0])) {
+            this.evictFriendCache(userId, friendId);
             domainService.publishEvent(userId, friendId, PlatformConstants.FRIEND_HANDLER_UNBIND);
         }
         if (BooleanUtil.isTrue(results[1])) {
+            this.evictFriendCache(friendId, userId);
             domainService.publishEvent(friendId, userId, PlatformConstants.FRIEND_HANDLER_UNBIND);
         }
     }
@@ -160,6 +165,7 @@ public class FriendServiceImpl implements FriendService {
         Long userId = SessionContext.getUserSession().getUserId();
         Boolean result = domainService.update(vo, userId);
         if (BooleanUtil.isTrue(result)) {
+            this.evictFriendCache(userId, vo.getId());
             domainService.publishEvent(userId, vo.getId(), PlatformConstants.FRIEND_HANDLER_UPDATE);
         }
     }
@@ -181,6 +187,63 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public boolean updateFriendByFriendId(String headImage, String nickName, Long friendId) {
-        return domainService.updateFriendByFriendId(headImage, nickName, friendId);
+        if (friendId == null) {
+            throw new BJException(HttpCode.PROGRAM_ERROR, "更新好友资料时，好友ID不能为空");
+        }
+        if (StrUtil.isAllEmpty(headImage, nickName)) {
+            logger.info("FriendServiceImpl.updateFriendByFriendId|头像和昵称均为空，跳过更新, friendId:{}", friendId);
+            return false;
+        }
+        boolean updated = domainService.updateFriendByFriendId(headImage, nickName, friendId);
+        if (!updated) {
+            logger.warn("FriendServiceImpl.updateFriendByFriendId|好友资料未更新，friendId:{}", friendId);
+            return false;
+        }
+        List<Long> userIdList = domainService.getUserIdListByFriendId(friendId);
+        if (CollectionUtil.isEmpty(userIdList)) {
+            logger.info("FriendServiceImpl.updateFriendByFriendId|未找到需要刷新的好友缓存, friendId:{}", friendId);
+            return true;
+        }
+        userIdList.forEach(userId -> this.evictFriendViewCache(userId, friendId));
+        logger.info("FriendServiceImpl.updateFriendByFriendId|好友资料同步完成并清理缓存, friendId:{}, userCount:{}", friendId, userIdList.size());
+        return true;
+    }
+
+    private void evictFriendCache(Long userId, Long friendId) {
+        if (userId == null) {
+            return;
+        }
+        distributeCacheService.delete(distributeCacheService.getKey(
+                PlatformConstants.PLATFORM_REDIS_FRIEND_LIST_KEY,
+                userId
+        ));
+        distributeCacheService.delete(distributeCacheService.getKey(
+                PlatformConstants.PLATFORM_REDIS_FRIEND_SET_KEY,
+                userId
+        ));
+        if (friendId != null) {
+            distributeCacheService.delete(distributeCacheService.getKey(
+                    PlatformConstants.PLATFORM_REDIS_FRIEND_SINGLE_KEY,
+                    new FriendCommand(userId, friendId)
+            ));
+        }
+        logger.info("FriendServiceImpl.evictFriendCache|好友缓存已删除, userId:{}, friendId:{}", userId, friendId);
+    }
+
+    private void evictFriendViewCache(Long userId, Long friendId) {
+        if (userId == null) {
+            return;
+        }
+        distributeCacheService.delete(distributeCacheService.getKey(
+                PlatformConstants.PLATFORM_REDIS_FRIEND_LIST_KEY,
+                userId
+        ));
+        if (friendId != null) {
+            distributeCacheService.delete(distributeCacheService.getKey(
+                    PlatformConstants.PLATFORM_REDIS_FRIEND_SINGLE_KEY,
+                    new FriendCommand(userId, friendId)
+            ));
+        }
+        logger.info("FriendServiceImpl.evictFriendViewCache|好友视图缓存已删除, userId:{}, friendId:{}", userId, friendId);
     }
 }

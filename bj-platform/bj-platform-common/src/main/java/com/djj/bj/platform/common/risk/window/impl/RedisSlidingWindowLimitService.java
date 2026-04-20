@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 
 /**
  * 基于Redis实现的滑动窗口限流服务
@@ -28,17 +29,20 @@ public class RedisSlidingWindowLimitService implements SlidingWindowLimitService
 
     @Override
     public boolean passThough(String key, long windowPeriod, int windowSize) {
+        if (windowPeriod <= 0 || windowSize <= 0) {
+            return false;
+        }
         // 风控key
         String riskControlKey = PlatformConstants.getKey(PlatformConstants.RISK_CONTROL_KEY_PREFIX, key);
 
         // 获取当前时间
         long currentTimeStamp = System.currentTimeMillis();
-        long length = windowPeriod * windowSize;
-        long start = currentTimeStamp - length;
+        long start = currentTimeStamp - windowPeriod;
         // 计算过期时间
-        long expireTime = length + windowPeriod;
+        long expireTime = windowPeriod * 2;
         // 添加当前时间戳到有序集合
-        redisTemplate.opsForZSet().add(riskControlKey, String.valueOf(currentTimeStamp), currentTimeStamp);
+        String member = currentTimeStamp + ":" + UUID.randomUUID();
+        redisTemplate.opsForZSet().add(riskControlKey, member, currentTimeStamp);
         // 移除[0,start]区间内的值
         redisTemplate.opsForZSet().removeRangeByScore(riskControlKey, 0, start);
         // 获取窗口内元素个数

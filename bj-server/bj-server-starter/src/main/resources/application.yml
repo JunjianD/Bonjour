@@ -7,10 +7,8 @@ server:
 spring:
   data:
     redis:
-      address: redis://222.186.48.169:6379
-#      address: redis://localhost:6379
-      host: 222.186.48.169
-#      host: localhost
+      address: ${BJ_REDIS_ADDRESS:redis://localhost:6379}
+      host: ${BJ_REDIS_HOST:localhost}
       port: 6379
       database: 0
       lettuce:
@@ -20,7 +18,7 @@ spring:
           max-idle: 16
           min-idle: 4
           max-wait: 2000ms
-      password: qwe159159159
+      password: ${BJ_REDIS_PASSWORD:}
 
 websocket:
   enable: true
@@ -35,11 +33,10 @@ heartbeat:
 
 jwt:
   accessToken:
-    secret: bonjour_access
+    secret: ${BJ_JWT_ACCESS_SECRET:change-me-access}
 
 rocketmq:
-  name-server: 222.186.48.169:9876
-#  name-server: localhost:9876
+  name-server: ${BJ_ROCKETMQ_NAME_SERVER:localhost:9876}
   producer:
     group: bj-server-group
 

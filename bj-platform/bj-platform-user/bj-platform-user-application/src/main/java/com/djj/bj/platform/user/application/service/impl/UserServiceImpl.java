@@ -179,6 +179,8 @@ public class UserServiceImpl implements UserService {
         if (Objects.isNull(user)) {
             throw new BJException(HttpCode.PROGRAM_ERROR, "用户不存在");
         }
+        String oldNickName = user.getNickName();
+        String oldHeadImageThumb = user.getHeadImageThumb();
         // 更新用户的基本信息
         if (!StrUtil.isEmpty(vo.getNickName())) {
             user.setNickName(vo.getNickName());
@@ -199,16 +201,16 @@ public class UserServiceImpl implements UserService {
         if (!result) {
             return;
         }
+        boolean nickNameChanged = !Objects.equals(oldNickName, user.getNickName());
+        boolean headImageThumbChanged = !Objects.equals(oldHeadImageThumb, user.getHeadImageThumb());
         // 如果用户更新了昵称和头像，则更新好友昵称和头像
-        if (!user.getNickName().equals(vo.getNickName()) || !user.getHeadImageThumb().equals(vo.getHeadImageThumb())) {
-            //TODO 后续完善
-            User2FriendEvent user2FriendEvent = new User2FriendEvent(session.getUserId(), vo.getNickName(), vo.getHeadImageThumb(), PlatformConstants.TOPIC_USER_TO_FRIEND);
+        if (nickNameChanged || headImageThumbChanged) {
+            User2FriendEvent user2FriendEvent = new User2FriendEvent(session.getUserId(), user.getNickName(), user.getHeadImageThumb(), PlatformConstants.TOPIC_USER_TO_FRIEND);
             messageSenderService.send(user2FriendEvent);
         }
         // 如果用户更新了昵称和头像，则更新群聊中的头像
-        if (!user.getNickName().equals(vo.getNickName()) || !user.getHeadImageThumb().equals(vo.getHeadImageThumb())) {
-            //TODO 后续完善
-            User2GroupEvent user2GroupEvent = new User2GroupEvent(session.getUserId(), vo.getHeadImageThumb(), PlatformConstants.TOPIC_USER_TO_GROUP);
+        if (nickNameChanged || headImageThumbChanged) {
+            User2GroupEvent user2GroupEvent = new User2GroupEvent(session.getUserId(), user.getHeadImageThumb(), PlatformConstants.TOPIC_USER_TO_GROUP);
             messageSenderService.send(user2GroupEvent);
         }
     }

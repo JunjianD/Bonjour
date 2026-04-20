@@ -29,4 +29,9 @@ public class AIDubboServiceImpl implements AIDubboService {
     public String sendMessage(String requestData) throws IOException {
         return aiInteractiveService.sendMessage(requestData);
     }
+
+    @Override
+    public String sendMessage(String conversationId, Long userId, String userName, String requestData) throws IOException {
+        return aiInteractiveService.sendMessage(conversationId, userId, userName, requestData);
+    }
 }

@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.djj.bj.common.cache.distribute.DistributeCacheService;
 import com.djj.bj.common.mq.event.MessageEventSenderService;
 import com.djj.bj.platform.common.exception.BJException;
 import com.djj.bj.platform.common.model.constants.PlatformConstants;
@@ -18,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +45,9 @@ public class UserDomainServiceImpl extends ServiceImpl<UserRepository, User> imp
     @Resource
     private MessageEventSenderService messageEventSenderService;
 
+    @Resource
+    private DistributeCacheService distributeCacheService;
+
     @Override
     public User getUserByUserName(String userName) {
         if (StrUtil.isEmpty(userName)) {
@@ -59,13 +65,8 @@ public class UserDomainServiceImpl extends ServiceImpl<UserRepository, User> imp
         }
         boolean result = this.saveOrUpdate(user);
         if (result) {
-            //TODO 发布更新缓存事件
             logger.info("UserDomainServiceImpl.saveOrUpdateUser|用户信息更新成功, userId:{}", user.getUserId());
-            UserEvent userEvent = new UserEvent(user.getUserId(), user.getUserName(), this.getTopicEvent());
-            boolean sendOk = messageEventSenderService.send(userEvent);
-            if (sendOk) {
-                logger.info("UserDomainServiceImpl.saveOrUpdateUser|用户事件已经发布, userId:{}", user.getUserId());
-            }
+            this.publishUserEvent(user);
         }
         return result;
     }
@@ -74,6 +75,43 @@ public class UserDomainServiceImpl extends ServiceImpl<UserRepository, User> imp
         return PlatformConstants.EVENT_PUBLISH_TYPE_ROCKETMQ.equals(eventType) ?
                 PlatformConstants.TOPIC_EVENT_ROCKETMQ_USER :
                 PlatformConstants.TOPIC_EVENT_LOCAL;
+    }
+
+    private void evictUserCache(User user) {
+        if (user.getUserId() != null) {
+            distributeCacheService.delete(PlatformConstants.PLATFORM_REDIS_USER_KEY + user.getUserId());
+        }
+        if (StrUtil.isNotEmpty(user.getUserName())) {
+            distributeCacheService.delete(PlatformConstants.PLATFORM_REDIS_USER_KEY + user.getUserName());
+        }
+    }
+
+    private void publishUserEvent(User user) {
+        UserEvent userEvent = new UserEvent(user.getUserId(), user.getUserName(), this.getTopicEvent());
+        Runnable cacheRefreshTask = () -> {
+            evictUserCache(user);
+            sendUserEvent(userEvent);
+        };
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    cacheRefreshTask.run();
+                }
+            });
+            logger.info("UserDomainServiceImpl.saveOrUpdateUser|用户缓存刷新已注册为事务提交后执行, userId:{}", user.getUserId());
+            return;
+        }
+        cacheRefreshTask.run();
+    }
+
+    private void sendUserEvent(UserEvent userEvent) {
+        boolean sendOk = messageEventSenderService.send(userEvent);
+        if (sendOk) {
+            logger.info("UserDomainServiceImpl.saveOrUpdateUser|用户事件已经发布, userId:{}", userEvent.getEventId());
+            return;
+        }
+        logger.warn("UserDomainServiceImpl.saveOrUpdateUser|用户事件发布失败, userId:{}", userEvent.getEventId());
     }
 
     @Override

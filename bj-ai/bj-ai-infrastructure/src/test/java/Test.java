@@ -36,11 +36,14 @@ public class Test {
         }
 
         try (CloseableHttpClient httpClient = HttpClient.createSSLClientDefault()) {
-
-//            HttpPost httpPost = new HttpPost("https://api.openai.com/v1/chat/completions");
-            HttpPost httpPost = new HttpPost("https://z.apiyihe.org/v1/chat/completions");
+            String api = System.getenv().getOrDefault("BJ_AI_CHATGPT_API", "https://api.openai.com/v1/chat/completions");
+            String aiKey = System.getenv("BJ_AI_CHATGPT_KEY");
+            if (StringUtils.isEmpty(aiKey)) {
+                throw new AIException("请通过环境变量 BJ_AI_CHATGPT_KEY 配置 AI Key");
+            }
+            HttpPost httpPost = new HttpPost(api);
             httpPost.addHeader(AIConstants.CONTENT_TYPE, AIConstants.APPLICATION_JSON);
-            httpPost.addHeader(AIConstants.AUTHORIZATION, AIConstants.BEARER.concat("sk-JEB1U9tnjorHT8dH7aP2fSL5ZCTZ4ixRjAjD5gtwvbcI8Gks"));
+            httpPost.addHeader(AIConstants.AUTHORIZATION, AIConstants.BEARER.concat(aiKey));
 
 //            HttpHost proxy = new HttpHost("http","127.0.0.1",7890);
 //            RequestConfig config = RequestConfig.custom()

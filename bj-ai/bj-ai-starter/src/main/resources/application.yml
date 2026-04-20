@@ -7,7 +7,8 @@ server:
 spring:
   config:
     import:
-      - optional:nacos:bj-platform-user.yaml?refreshEnabled=true&group=DEFAULT_GROUP
+      - "optional:nacos:bj-common.yaml?refreshEnabled=true&group=${BJ_NACOS_CONFIG_GROUP:BJ-GROUP}"
+      - "optional:nacos:bj-ai.yaml?refreshEnabled=true&group=${BJ_NACOS_CONFIG_GROUP:BJ-GROUP}"
   application:
     name: bj-ai
   main:
@@ -20,67 +21,80 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+  data:
+    redis:
+      address: ${BJ_REDIS_ADDRESS:redis://localhost:6379}
+      host: ${BJ_REDIS_HOST:localhost}
+      port: 6379
+      database: 0
+      lettuce:
+        pool:
+          enabled: true
+          max-active: 32
+          max-idle: 16
+          min-idle: 4
+          max-wait: 2000ms
+      password: ${BJ_REDIS_PASSWORD:}
   cloud:
     nacos:
-      server-addr: 222.186.48.169:8848
-      #      server-addr: localhost:8848
-      username: 'nacos'
-      password: 'qwe159159159'
+      server-addr: ${BJ_NACOS_SERVER_ADDR:localhost:8848}
+      username: '${BJ_NACOS_USERNAME:nacos}'
+      password: '${BJ_NACOS_PASSWORD:}'
       discovery:
-        server-addr: 222.186.48.169:8848
-        #        server-addr: localhost:8848
-        username: 'nacos'
-        password: 'qwe159159159'
+        server-addr: ${BJ_NACOS_SERVER_ADDR:localhost:8848}
+        username: '${BJ_NACOS_USERNAME:nacos}'
+        password: '${BJ_NACOS_PASSWORD:}'
         enabled: true
-        namespace: bj
-        group: BJ-GROUP
+        namespace: ${BJ_NACOS_NAMESPACE:bj}
+        group: ${BJ_NACOS_DISCOVERY_GROUP:BJ-GROUP}
       config:
         file-extension: json
 
 dubbo:
   application:
     name: ${spring.application.name}
+    qos-enable: false
     qos-port: 22300
     logger: slf4j
   scan:
-    #    base-packages: com.djj.bj.platform.user.application.dubbo
-    base-packages: com.djj.bj.ai
+    base-packages: com.djj.bj.ai.application.dubbo
   protocol:
     name: dubbo
     port: 20887
     threads: 200
   registry:
-    address: nacos://222.186.48.169:8848?namespace=bj&register-consumer-url=true
-    #    address: nacos://localhost:8848?namespace=bj&register-consumer-url=true
+    address: "nacos://${BJ_NACOS_SERVER_ADDR:localhost:8848}?namespace=${BJ_NACOS_NAMESPACE:bj}&register-consumer-url=true"
     register-mode: instance
-    username: nacos
-    password: qwe159159159
-    group: BJ-GROUP
+    username: ${BJ_NACOS_USERNAME:nacos}
+    password: ${BJ_NACOS_PASSWORD:}
+    group: ${BJ_NACOS_DISCOVERY_GROUP:BJ-GROUP}
 
 bj-ai:
+  context:
+    max-rounds: ${BJ_AI_CONTEXT_MAX_ROUNDS:10}
+    ttl-hours: ${BJ_AI_CONTEXT_TTL_HOURS:24}
   type: chatgpt
   chatgpt:
-#    key: sk-JEB1U9tnjorHT8dH7aP2fSL5ZCTZ4ixRjAjD5gtwvbcI8Gks
-    key: sk-rfiugo5We0gPiXgyD6zGkDCzlDuqebQOeiTkZ1WUvE8P9py2
-    api: https://z.apiyihe.org/v1/chat/completions
+    key: ${BJ_AI_CHATGPT_KEY:}
+    api: ${BJ_AI_CHATGPT_API:https://api.openai.com/v1/chat/completions}
   chatglm:
-    key: xxxxxxx
-    api: xxxxxxxx
+    key: ${BJ_AI_CHATGLM_KEY:}
+    api: ${BJ_AI_CHATGLM_API:}
   claude:
-    key: xxxxxxx
-    api: xxxxxxxx
+    key: ${BJ_AI_CLAUDE_KEY:}
+    api: ${BJ_AI_CLAUDE_API:}
   tongyi:
-    key: xxxxxxx
-    api: xxxxxxx
+    key: ${BJ_AI_TONGYI_KEY:}
+    api: ${BJ_AI_TONGYI_API:}
   palm:
-    key: xxxxxxx
-    api: xxxxxxx
+    key: ${BJ_AI_PALM_KEY:}
+    api: ${BJ_AI_PALM_API:}
   xinghuo:
-    key: xxxxxxx
-    api: xxxxxxx
+    key: ${BJ_AI_XINGHUO_KEY:}
+    api: ${BJ_AI_XINGHUO_API:}
   wenxin:
-    key: xxxxxxx
-    api: xxxxxxx
+    key: ${BJ_AI_WENXIN_KEY:}
+    api: ${BJ_AI_WENXIN_API:}
   hunyuan:
-    key: xxxxxxx
-    api: xxxxxxx
+    key: ${BJ_AI_HUNYUAN_KEY:}
+    api: ${BJ_AI_HUNYUAN_API:}

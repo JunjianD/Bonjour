@@ -4,6 +4,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -22,14 +23,19 @@ import java.util.Arrays;
  */
 @Configuration
 public class CorsConfig {
+    @Value("${cors.allowed-origin-patterns:${BJ_CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:8080,http://localhost:8081,http://222.186.48.169,http://222.186.48.169:8898}}")
+    private String allowedOriginPatterns;
+
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilter() {
         FilterRegistrationBean<CorsFilter> corsFilterFilterRegistrationBean = new FilterRegistrationBean<>();
         //添加CORS配置信息
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        //允许的域，不要写*，否则cookie就无法使用了
-        //corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedOriginPattern("*");
+        // 允许的域名模式通过配置中心或环境变量收敛，避免携带凭证时放开任意来源。
+        corsConfiguration.setAllowedOriginPatterns(Arrays.stream(allowedOriginPatterns.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList());
         //允许的头信息
         corsConfiguration.addAllowedHeader("*");
         //允许的请求方式

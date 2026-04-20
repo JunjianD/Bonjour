@@ -81,6 +81,6 @@ public interface PrivateMessageRepository extends BaseMapper<PrivateMessage> {
     @Update("update bj_private_message set status = #{status} where id = #{messageId}")
     int updateMessageStatusById(@Param("status") Integer status, @Param("messageId") Long messageId);
 
-    @Select("select id from bj_private_message where send_id = #{userId} and recv_id = #{friendId} order by id desc limit 1 ")
+    @Select("select id from bj_private_message where send_id = #{userId} and recv_id = #{friendId} and status = 3 order by id desc limit 1 ")
     Long getMaxReadedId(@Param("userId") Long userId, @Param("friendId") Long friendId);
 }
