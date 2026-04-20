@@ -106,7 +106,12 @@ public class GroupMessageRocketMQEventConsumer implements RocketMQListener<Strin
         }
         try {
             logger.info("群聊消息发送AI消息开始");
-            String AIMessage = aiDubboService.sendMessage(groupMessageVO.getContent());
+            String AIMessage = aiDubboService.sendMessage(
+                    buildGroupConversationId(groupMessageVO.getGroupId(), groupMessageVO.getSendId()),
+                    groupMessageVO.getSendId(),
+                    groupMessageTxEvent.getSendNickName(),
+                    groupMessageVO.getContent()
+            );
             logger.info("群聊消息发送AI消息，AI返回的消息内容: {}", AIMessage);
 
             GroupMessageVO groupAIMessageVO = new GroupMessageVO();
@@ -142,5 +147,9 @@ public class GroupMessageRocketMQEventConsumer implements RocketMQListener<Strin
         JSONObject jsonObject = JSONObject.parseObject(message);
         String eventStr = jsonObject.getString(Constants.MSG_KEY);
         return JSONObject.parseObject(eventStr, GroupMessageTxEvent.class);
+    }
+
+    private String buildGroupConversationId(Long groupId, Long userId) {
+        return "group:" + groupId + ":user:" + userId;
     }
 }

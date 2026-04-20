@@ -21,4 +21,18 @@ public interface AIInteractiveService {
      * @throws IOException IO异常
      */
     String sendMessage(String requestData) throws IOException;
+
+    /**
+     * 往大模型发送带会话上下文的数据，并接受返回结果
+     *
+     * @param conversationId 会话id
+     * @param userId         当前用户id
+     * @param userName       当前用户名/昵称
+     * @param requestData    本次发送的数据
+     * @return 大模型返回结果
+     * @throws IOException IO异常
+     */
+    default String sendMessage(String conversationId, Long userId, String userName, String requestData) throws IOException {
+        return sendMessage(requestData);
+    }
 }

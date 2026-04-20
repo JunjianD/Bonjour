@@ -146,6 +146,7 @@ public class GroupMessageServiceImpl implements GroupMessageService {
                     PlatformConstants.PULL_HISTORY_MESSAGE_LIMIT_COUNR
             );
             if (!CollectionUtil.isEmpty(unreadGroupMessageList)) {
+                fillAtUserIds(unreadGroupMessageList);
                 GroupMessageThreadPoolUtils.execute(() -> {
                     for (GroupMessageVO groupMessageVO : unreadGroupMessageList) {
                         GroupChat<GroupMessageVO> groupChat = new GroupChat<>();
@@ -184,10 +185,7 @@ public class GroupMessageServiceImpl implements GroupMessageService {
         if (CollectionUtil.isEmpty(groupMessageVOList)) {
             return Collections.emptyList();
         }
-        List<GroupMessageVO> vos = groupMessageVOList.stream().peek(m -> {
-            List<String> atIds = StrUtil.split(m.getAtUserIdsStr(), Constants.USER_ID_SPLIT);
-            m.setAtUserIds(atIds.stream().map(Long::parseLong).toList());
-        }).toList();
+        List<GroupMessageVO> vos = fillAtUserIds(groupMessageVOList);
         List<String> keys = groupIds.stream().map(id -> String.join(
                 Constants.REDIS_KEY_SPLIT,
                 Constants.GROUP_MESSAGE_READ_POSITION,
@@ -225,10 +223,28 @@ public class GroupMessageServiceImpl implements GroupMessageService {
         List<GroupMessageVO> historyMessage = groupMessageDomainService.getHistoryMessage(groupId, groupMember.getCreateTime(), MessageStatus.WITHDRAW.getCode(), stIdx, size);
         if (CollectionUtil.isEmpty(historyMessage)) {
             historyMessage = Collections.emptyList();
+        } else {
+            fillAtUserIds(historyMessage);
         }
         logger.info("GroupMessageServiceImpl.findHistoryMessage | 拉取群聊历史消息 | 群组ID: {}, 用户ID: {}, 页码: {}, 每页大小: {}, 历史消息数量: {}",
                 groupId, userId, page, size, historyMessage.size());
         return historyMessage;
+    }
+
+    private List<GroupMessageVO> fillAtUserIds(List<GroupMessageVO> messages) {
+        messages.forEach(message -> message.setAtUserIds(parseAtUserIds(message.getAtUserIdsStr())));
+        return messages;
+    }
+
+    private List<Long> parseAtUserIds(String atUserIdsStr) {
+        if (StrUtil.isBlank(atUserIdsStr)) {
+            return Collections.emptyList();
+        }
+        return StrUtil.split(atUserIdsStr, Constants.USER_ID_SPLIT)
+                .stream()
+                .filter(StrUtil::isNotBlank)
+                .map(Long::parseLong)
+                .toList();
     }
 
     @Override

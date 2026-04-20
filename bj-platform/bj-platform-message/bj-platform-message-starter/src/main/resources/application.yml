@@ -7,7 +7,8 @@ server:
 spring:
   config:
     import:
-      - optional:nacos:bj-platform-user.yaml?refreshEnabled=true&group=DEFAULT_GROUP
+      - "optional:nacos:bj-common.yaml?refreshEnabled=true&group=${BJ_NACOS_CONFIG_GROUP:BJ-GROUP}"
+      - "optional:nacos:bj-platform-message.yaml?refreshEnabled=true&group=${BJ_NACOS_CONFIG_GROUP:BJ-GROUP}"
   application:
     name: bj-platform-message
   main:
@@ -18,10 +19,9 @@ spring:
       matching-strategy: path_pattern_parser
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://222.186.48.169:3306/bj?useSSL=true&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
-#    url: jdbc:mysql://localhost:3306/bj?useSSL=true&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
-    username: root
-    password: qwe159159159
+    url: ${BJ_MYSQL_URL:jdbc:mysql://localhost:3306/bj?useSSL=true&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true}
+    username: ${BJ_MYSQL_USERNAME:root}
+    password: ${BJ_MYSQL_PASSWORD:}
     hikari:
       minimum-idle: 4                  # 保证热连接
       maximum-pool-size: 16            # 根据线上 QPS 调整
@@ -36,10 +36,8 @@ spring:
       max-request-size: 50MB
   data:
     redis:
-      address: redis://222.186.48.169:6379
-#      address: redis://localhost:6379
-      host: 222.186.48.169
-#      host: localhost
+      address: ${BJ_REDIS_ADDRESS:redis://localhost:6379}
+      host: ${BJ_REDIS_HOST:localhost}
       port: 6379
       database: 0
       lettuce:
@@ -49,41 +47,36 @@ spring:
           max-idle: 16
           min-idle: 4
           max-wait: 2000ms
-      password: qwe159159159
+      password: ${BJ_REDIS_PASSWORD:}
   cloud:
     nacos:
-      server-addr: 222.186.48.169:8848
-#      server-addr: localhost:8848
-      username: 'nacos'
-      password: 'qwe159159159'
+      server-addr: ${BJ_NACOS_SERVER_ADDR:localhost:8848}
+      username: '${BJ_NACOS_USERNAME:nacos}'
+      password: '${BJ_NACOS_PASSWORD:}'
       discovery:
-        server-addr: 222.186.48.169:8848
-#        server-addr: localhost:8848
-        username: 'nacos'
-        password: 'qwe159159159'
+        server-addr: ${BJ_NACOS_SERVER_ADDR:localhost:8848}
+        username: '${BJ_NACOS_USERNAME:nacos}'
+        password: '${BJ_NACOS_PASSWORD:}'
         enabled: true
-        namespace: bj
-        group: BJ-GROUP
+        namespace: ${BJ_NACOS_NAMESPACE:bj}
+        group: ${BJ_NACOS_DISCOVERY_GROUP:BJ-GROUP}
 
 dubbo:
   application:
     name: ${spring.application.name}
+    qos-enable: false
     qos-port: 22225
     logger: slf4j
-  scan:
-    #    base-packages: com.djj.bj.platform.user.application.dubbo
-    base-packages: com.djj.bj.platform.message
   protocol:
     name: dubbo
     port: 20884
     threads: 200
   registry:
-    address: nacos://222.186.48.169:8848?namespace=bj&register-consumer-url=true
-#    address: nacos://localhost:8848?namespace=bj&register-consumer-url=true
+    address: "nacos://${BJ_NACOS_SERVER_ADDR:localhost:8848}?namespace=${BJ_NACOS_NAMESPACE:bj}&register-consumer-url=true"
     register-mode: instance
-    username: nacos
-    password: qwe159159159
-    group: BJ-GROUP
+    username: ${BJ_NACOS_USERNAME:nacos}
+    password: ${BJ_NACOS_PASSWORD:}
+    group: ${BJ_NACOS_DISCOVERY_GROUP:BJ-GROUP}
 
 
 mybatis-plus:
@@ -97,16 +90,13 @@ mybatis-plus:
     - classpath*:mapper/*.xml
 
 minio:
-  endpoint: http://localhost:9000 #内网地址
-#  endpoint: http://222.186.48.169:9000 #内网地址
-  public: http://222.186.48.169:9000  #外网访问地址
-#  accessKey: 6eVRsvNgaFT8Kz8ltZ9E
-#  secretKey: 4MHuhc4faJACk03fFIeBiFVBCv56DCv44S5WbVTi
-  accessKey: z8YqNZ4hHDDE2PAScpYF
-  secretKey: VFT0XsWQhVIWzmusfrFrycz9dwG0PrxskaKr5M96
-  bucketName: djj-bj
-  imagePath: image
-  filePath: file
+  endpoint: ${BJ_MINIO_ENDPOINT:http://localhost:9000}
+  public: ${BJ_MINIO_PUBLIC_URL:http://localhost:9000}
+  accessKey: ${BJ_MINIO_ACCESS_KEY:}
+  secretKey: ${BJ_MINIO_SECRET_KEY:}
+  bucketName: ${BJ_MINIO_BUCKET:djj-bj}
+  imagePath: ${BJ_MINIO_IMAGE_PATH:image}
+  filePath: ${BJ_MINIO_FILE_PATH:file}
 
 webrtc:
   iceServers:
@@ -115,14 +105,13 @@ webrtc:
 jwt:
   accessToken:
     expireIn: 1800 #半个小时
-    secret: bonjour_access
+    secret: ${BJ_JWT_ACCESS_SECRET:change-me-access}
   refreshToken:
     expireIn: 604800 #7天
-    secret: bonjour_refresh
+    secret: ${BJ_JWT_REFRESH_SECRET:change-me-refresh}
 
 rocketmq:
-  name-server: 222.186.48.169:9876
-#  name-server: localhost:9876
+  name-server: ${BJ_ROCKETMQ_NAME_SERVER:localhost:9876}
   producer:
     group: bj-plate-group
 

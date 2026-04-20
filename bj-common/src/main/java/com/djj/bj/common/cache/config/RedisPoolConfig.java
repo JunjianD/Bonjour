@@ -1,5 +1,6 @@
 package com.djj.bj.common.cache.config;
 
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -98,7 +99,9 @@ public class RedisPoolConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setDatabase(database);
         redisStandaloneConfiguration.setHostName(host);
-        redisStandaloneConfiguration.setPassword(password);
+        if (StrUtil.isNotEmpty(password)) {
+            redisStandaloneConfiguration.setPassword(password);
+        }
         redisStandaloneConfiguration.setPort(port);
         return redisStandaloneConfiguration;
     }

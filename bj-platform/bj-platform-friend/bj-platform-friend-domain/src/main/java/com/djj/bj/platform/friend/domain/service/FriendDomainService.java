@@ -30,6 +30,14 @@ public interface FriendDomainService extends IService<Friend> {
     List<Long> getFriendIdList(Long userId);
 
     /**
+     * 根据好友ID获取拥有该好友关系的用户ID列表
+     *
+     * @param friendId 好友ID
+     * @return 用户ID列表
+     */
+    List<Long> getUserIdListByFriendId(Long friendId);
+
+    /**
      * 根据用户id获取好友列表
      *
      * @param userId 用户ID

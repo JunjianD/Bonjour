@@ -50,7 +50,7 @@ public class LoginProcessor implements MessageProcessor<LoginInfo> {
         // 登录Token检验未通过
         if (!JwtUtils.checkSign(loginInfo.getAccessToken(), accessTokenSecret)) {
             ctx.channel().close();
-            logger.warn("LoginProcessor.process|用户登录信息校验未通过,强制下线,token:{}", loginInfo.getAccessToken());
+            logger.warn("LoginProcessor.process|用户登录信息校验未通过,强制下线");
             return;
         }
 

@@ -9,13 +9,16 @@ import com.djj.bj.common.io.model.PrivateChat;
 import com.djj.bj.common.io.model.UserInfo;
 import com.djj.bj.platform.common.model.constants.PlatformConstants;
 import com.djj.bj.platform.common.model.enums.MessageStatus;
+import com.djj.bj.platform.common.model.enums.MessageType;
 import com.djj.bj.platform.common.model.vo.PrivateMessageVO;
 import com.djj.bj.platform.common.threadpool.PrivateMessageThreadPoolUtils;
 import com.djj.bj.platform.common.utils.BeanUtils;
 import com.djj.bj.platform.message.domain.event.PrivateMessageTxEvent;
+import com.djj.bj.platform.message.domain.service.PrivateMessageDomainService;
 import com.djj.bj.sdk.core.client.Client;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.rpc.RpcException;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.slf4j.Logger;
@@ -46,11 +49,17 @@ public class PrivateMessageRocketMQEventConsumer implements RocketMQListener<Str
     @Resource
     private Client client;
 
+    @Resource
+    private PrivateMessageDomainService privateMessageDomainService;
+
     @Value("${bj.ai.userid:10000000001}")
     private Long aiUserId;
 
     @Value("${bj.ai.username:binghe}")
     private String aiUserName;
+
+    @Value("${bj.ai.unavailable-message:AI服务暂时不可用，请稍后再试。}")
+    private String aiUnavailableMessage;
 
     @DubboReference(version = PlatformConstants.DEFAULT_DUBBO_VERSION, check = false, timeout = 60000, retries = 0)
     private AIDubboService aiDubboService;
@@ -108,8 +117,15 @@ public class PrivateMessageRocketMQEventConsumer implements RocketMQListener<Str
         }
         try {
             logger.info("私聊发送AI消息开始");
-            String aiMessage = aiDubboService.sendMessage(privateMessageVO.getContent());
+            String aiMessage = aiDubboService.sendMessage(
+                    buildPrivateConversationId(privateMessageVO.getSendId()),
+                    privateMessageVO.getSendId(),
+                    String.valueOf(privateMessageVO.getSendId()),
+                    privateMessageVO.getContent()
+            );
             logger.info("私聊发送AI消息，AI返回的消息内容: {}", aiMessage);
+
+            markAiMessageRead(privateMessageVO, terminal);
 
             PrivateMessageVO aiMessageVO = new PrivateMessageVO();
 
@@ -130,7 +146,57 @@ public class PrivateMessageRocketMQEventConsumer implements RocketMQListener<Str
             logger.info("私聊发送AI消息结束");
         } catch (IOException e) {
             logger.error("对接AI大模型消息异常: ", e);
+            handleAiUnavailable(privateMessageVO, terminal, "调用AI接口发生IO异常");
+        } catch (RpcException e) {
+            logger.error("对接AI大模型消息异常，Dubbo未找到可用提供者: ", e);
+            handleAiUnavailable(privateMessageVO, terminal, "AI服务暂时未注册或不可用");
+        } catch (Exception e) {
+            logger.error("对接AI大模型消息异常: ", e);
+            handleAiUnavailable(privateMessageVO, terminal, "AI服务处理异常");
         }
+    }
+
+    private void markAiMessageRead(PrivateMessageVO privateMessageVO, Integer terminal) {
+        privateMessageDomainService.updateMessageStatusById(MessageStatus.READED.getCode(), privateMessageVO.getId());
+        PrivateMessageVO readedMessageVO = new PrivateMessageVO();
+        readedMessageVO.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
+        readedMessageVO.setSendId(aiUserId);
+        readedMessageVO.setRecvId(privateMessageVO.getSendId());
+        readedMessageVO.setType(MessageType.READED.getCode());
+        readedMessageVO.setStatus(MessageStatus.READED.getCode());
+        readedMessageVO.setSendTime(new Date());
+
+        PrivateChat<PrivateMessageVO> readedMessage = new PrivateChat<>();
+        readedMessage.setSender(new UserInfo(aiUserId, terminal));
+        readedMessage.setReceiverId(privateMessageVO.getSendId());
+        readedMessage.setSendToSelfOtherTerminals(true);
+        readedMessage.setReturnResult(false);
+        readedMessage.setContent(readedMessageVO);
+        client.sendPrivateMessage(readedMessage);
+    }
+
+    private void handleAiUnavailable(PrivateMessageVO privateMessageVO, Integer terminal, String fallbackMessage) {
+        markAiMessageRead(privateMessageVO, terminal);
+
+        PrivateMessageVO aiMessageVO = new PrivateMessageVO();
+        aiMessageVO.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
+        aiMessageVO.setSendId(aiUserId);
+        aiMessageVO.setRecvId(privateMessageVO.getSendId());
+        aiMessageVO.setContent(StrUtil.isNotBlank(fallbackMessage) ? fallbackMessage : aiUnavailableMessage);
+        aiMessageVO.setType(privateMessageVO.getType());
+        aiMessageVO.setStatus(MessageStatus.UNSEND.getCode());
+        aiMessageVO.setSendTime(new Date());
+
+        PrivateChat<PrivateMessageVO> sendMessage = new PrivateChat<>();
+        sendMessage.setSender(new UserInfo(aiMessageVO.getSendId(), terminal));
+        sendMessage.setReceiverId(aiMessageVO.getRecvId());
+        sendMessage.setSendToSelfOtherTerminals(true);
+        sendMessage.setContent(aiMessageVO);
+        client.sendPrivateMessage(sendMessage);
+    }
+
+    private String buildPrivateConversationId(Long userId) {
+        return "private:user:" + userId;
     }
 
     private PrivateMessageTxEvent getEventMessage(String message) {

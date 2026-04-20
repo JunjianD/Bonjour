@@ -48,6 +48,14 @@ public class FriendDomainServiceImpl extends ServiceImpl<FriendRepository, Frien
     }
 
     @Override
+    public List<Long> getUserIdListByFriendId(Long friendId) {
+        if (friendId == null) {
+            throw new BJException(HttpCode.PARAMS_ERROR);
+        }
+        return baseMapper.getUserIdListByFriendId(friendId);
+    }
+
+    @Override
     public List<FriendVO> findFriendByUserId(Long userId) {
         if (userId == null) {
             throw new BJException(HttpCode.PARAMS_ERROR);
@@ -106,7 +114,12 @@ public class FriendDomainServiceImpl extends ServiceImpl<FriendRepository, Frien
                 eventType,
                 this.getTopicEvent()
         );
-        messageEventSenderService.send(friendEvent);
+        boolean sendOk = messageEventSenderService.send(friendEvent);
+        if (sendOk) {
+            logger.info("FriendDomainServiceImpl.publishEvent|好友事件已发布, userId:{}, friendId:{}, handler:{}", userId, friendId, eventType);
+            return;
+        }
+        logger.warn("FriendDomainServiceImpl.publishEvent|好友事件发布失败, userId:{}, friendId:{}, handler:{}", userId, friendId, eventType);
     }
 
     @Override

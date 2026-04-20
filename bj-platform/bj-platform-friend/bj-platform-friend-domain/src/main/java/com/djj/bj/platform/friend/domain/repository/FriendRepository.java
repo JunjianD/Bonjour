@@ -81,18 +81,21 @@ public interface FriendRepository extends BaseMapper<Friend> {
     @Select("select friend_id from bj_friend where user_id = #{userId}")
     List<Long> getFriendIdList(@Param("userId") Long userId);
 
+    @Select("select user_id from bj_friend where friend_id = #{friendId}")
+    List<Long> getUserIdListByFriendId(@Param("friendId") Long friendId);
+
     @Select("select id as id, user_id as userId, friend_id as friendId, friend_nick_name as friendNickName, friend_head_image as friendHeadImage, created_time as createdTime " +
             "from bj_friend where user_id = #{userId} ")
     List<Friend> getFriendByUserId(@Param("userId") Long userId);
 
     @Update("<script>" +
-            "update bj_friend set " +
+            "update bj_friend " +
             "<set>" +
             "<if test = \"headImage != null and headImage != ''\">" +
-            "friend_head_image = #{headImage} " +
+            "friend_head_image = #{headImage}, " +
             "</if>" +
             "<if test = \"nickName != null and nickName != ''\">" +
-            "friend_nick_name = #{nickName} " +
+            "friend_nick_name = #{nickName}, " +
             "</if>" +
             "</set>" +
             " where friend_id = #{friendId}" +

@@ -53,9 +53,10 @@ public class FriendCacheServiceImpl implements FriendCacheService {
                 PlatformConstants.FRIEND_UPDATE_CACHE_LOCK_KEY,
                 String.valueOf(friendEvent.getEventId())
         ));
+        boolean locked = false;
         try {
-            boolean success = distributedLock.tryLock();
-            if (!success) {
+            locked = distributedLock.tryLock();
+            if (!locked) {
                 logger.info("IMFriendCacheService|更新分布式缓存时，获取锁失败，key:{}", PlatformConstants.FRIEND_UPDATE_CACHE_LOCK_KEY.concat(String.valueOf(friendEvent.getEventId())));
                 return;
             }
@@ -69,9 +70,11 @@ public class FriendCacheServiceImpl implements FriendCacheService {
                 }
             }
         } catch (Exception e) {
-            logger.error("IMFriendCacheService|更新分布式缓存时发生异常 | {}", JSONObject.toJSONString(friendEvent));
+            logger.error("IMFriendCacheService|更新分布式缓存时发生异常 | {}", JSONObject.toJSONString(friendEvent), e);
         } finally {
-            distributedLock.unlock();
+            if (locked) {
+                distributedLock.unlock();
+            }
         }
     }
 
@@ -87,13 +90,15 @@ public class FriendCacheServiceImpl implements FriendCacheService {
         if (!CollectionUtil.isEmpty(friendList)) {
             distributeCacheService.set(redisKey, friendList, PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME, TimeUnit.MINUTES);
         } else {
-            distributeCacheService.set(redisKey, PlatformConstants.EMPTY_VALUE, PlatformConstants.DEFAULT_REDIS_CACHE_NULL_EXPIRE_TIME, TimeUnit.SECONDS);
+            distributeCacheService.set(redisKey, PlatformConstants.EMPTY_LIST_VALUE, PlatformConstants.DEFAULT_REDIS_CACHE_NULL_EXPIRE_TIME, TimeUnit.SECONDS);
         }
         FriendCommand friendCommand = new FriendCommand(friendEvent.getEventId(), friendEvent.getFriendId());
         FriendVO friendVO = friendDomainService.findFriend(friendCommand);
+        redisKey = distributeCacheService.getKey(PlatformConstants.PLATFORM_REDIS_FRIEND_SINGLE_KEY, friendCommand);
         if (friendVO != null) {
-            redisKey = distributeCacheService.getKey(PlatformConstants.PLATFORM_REDIS_FRIEND_SINGLE_KEY, friendCommand);
             distributeCacheService.set(redisKey, friendVO, PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME, TimeUnit.MINUTES);
+        } else {
+            distributeCacheService.delete(redisKey);
         }
     }
 
@@ -109,7 +114,7 @@ public class FriendCacheServiceImpl implements FriendCacheService {
         if (!CollectionUtil.isEmpty(friendList)) {
             distributeCacheService.set(redisKey, friendList, PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME, TimeUnit.MINUTES);
         } else {
-            distributeCacheService.set(redisKey, PlatformConstants.EMPTY_VALUE, PlatformConstants.DEFAULT_REDIS_CACHE_NULL_EXPIRE_TIME, TimeUnit.SECONDS);
+            distributeCacheService.set(redisKey, PlatformConstants.EMPTY_LIST_VALUE, PlatformConstants.DEFAULT_REDIS_CACHE_NULL_EXPIRE_TIME, TimeUnit.SECONDS);
         }
         FriendCommand friendCommand = new FriendCommand(friendEvent.getEventId(), friendEvent.getFriendId());
         redisKey = distributeCacheService.getKey(PlatformConstants.PLATFORM_REDIS_FRIEND_SINGLE_KEY, friendCommand);
@@ -123,13 +128,15 @@ public class FriendCacheServiceImpl implements FriendCacheService {
         if (!CollectionUtil.isEmpty(friendList)) {
             distributeCacheService.set(redisKey, friendList, PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME, TimeUnit.MINUTES);
         } else {
-            distributeCacheService.set(redisKey, PlatformConstants.EMPTY_VALUE, PlatformConstants.DEFAULT_REDIS_CACHE_NULL_EXPIRE_TIME, TimeUnit.SECONDS);
+            distributeCacheService.set(redisKey, PlatformConstants.EMPTY_LIST_VALUE, PlatformConstants.DEFAULT_REDIS_CACHE_NULL_EXPIRE_TIME, TimeUnit.SECONDS);
         }
         FriendCommand friendCommand = new FriendCommand(friendEvent.getEventId(), friendEvent.getFriendId());
         FriendVO friendVO = friendDomainService.findFriend(friendCommand);
+        redisKey = distributeCacheService.getKey(PlatformConstants.PLATFORM_REDIS_FRIEND_SINGLE_KEY, friendCommand);
         if (friendVO != null) {
-            redisKey = distributeCacheService.getKey(PlatformConstants.PLATFORM_REDIS_FRIEND_SINGLE_KEY, friendCommand);
             distributeCacheService.set(redisKey, friendVO, PlatformConstants.DEFAULT_REDIS_CACHE_EXPIRE_TIME, TimeUnit.MINUTES);
+        } else {
+            distributeCacheService.delete(redisKey);
         }
     }
 }

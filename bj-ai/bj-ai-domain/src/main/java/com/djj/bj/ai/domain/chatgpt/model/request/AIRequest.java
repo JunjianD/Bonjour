@@ -23,6 +23,7 @@ import java.util.List;
  */
 @NoArgsConstructor
 @Getter
+@Setter
 public class AIRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = -8477135444419025854L;

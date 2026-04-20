@@ -379,8 +379,9 @@ public class RedisDistributeCacheService implements DistributeCacheService {
         String lockKey = this.getLockKey(key); // 获取锁key
         T t = null;
         DistributedLock distributedLock = distributedLockFactory.getDistributedLock(lockKey);
+        boolean isLock = false;
         try{
-            boolean isLock = distributedLock.tryLock(); // 尝试获取锁
+            isLock = distributedLock.tryLock(); // 尝试获取锁
             if (!isLock) {
                 Thread.sleep(THREAD_SLEEP_MILLISECONDS);
                 return queryWithMutex(keyPrefix, id, clazz, dbFallback, timeout, timeUnit);
@@ -398,10 +399,13 @@ public class RedisDistributeCacheService implements DistributeCacheService {
             }
             this.set(key, t, timeout, timeUnit); // 数据库中有数据，设置缓存
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             logger.error("query data with mutex|{}", e.getMessage());
             throw new RuntimeException(e);
         } finally {
-            distributedLock.unlock(); // 释放锁
+            if (isLock) {
+                distributedLock.unlock(); // 释放锁
+            }
         }
         return t;
     }
@@ -421,8 +425,9 @@ public class RedisDistributeCacheService implements DistributeCacheService {
         String lockKey = this.getLockKey(key); // 获取锁key
         T t = null;
         DistributedLock distributedLock = distributedLockFactory.getDistributedLock(lockKey);
+        boolean isLock = false;
         try {
-            boolean isLock = distributedLock.tryLock(); // 尝试获取锁
+            isLock = distributedLock.tryLock(); // 尝试获取锁
             if (!isLock) {
                 Thread.sleep(THREAD_SLEEP_MILLISECONDS);
                 return queryWithMutexWithoutArgs(keyPrefix, clazz, dbFallback, timeout, timeUnit);
@@ -440,10 +445,13 @@ public class RedisDistributeCacheService implements DistributeCacheService {
             }
             this.set(key, t, timeout, timeUnit); // 数据库中有数据，设置缓存
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             logger.error("query data with mutex|{}", e.getMessage());
             throw new RuntimeException(e);
         } finally {
-            distributedLock.unlock(); // 释放锁
+            if (isLock) {
+                distributedLock.unlock(); // 释放锁
+            }
         }
         return t;
     }
@@ -463,8 +471,9 @@ public class RedisDistributeCacheService implements DistributeCacheService {
         String lockKey = this.getLockKey(key); // 获取锁key
         List<T> t = null;
         DistributedLock distributedLock = distributedLockFactory.getDistributedLock(lockKey);
+        boolean isLock = false;
         try {
-            boolean isLock = distributedLock.tryLock(); // 尝试获取锁
+            isLock = distributedLock.tryLock(); // 尝试获取锁
             if (!isLock) {
                 Thread.sleep(THREAD_SLEEP_MILLISECONDS);
                 return queryWithMutexList(keyPrefix, id, clazz, dbFallback, timeout, timeUnit);
@@ -482,10 +491,13 @@ public class RedisDistributeCacheService implements DistributeCacheService {
             }
             this.set(key, t, timeout, timeUnit); // 数据库中有数据，设置缓存
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             logger.error("query data with mutex list|{}", e.getMessage());
             throw new RuntimeException(e);
         } finally {
-            distributedLock.unlock(); // 释放锁
+            if (isLock) {
+                distributedLock.unlock(); // 释放锁
+            }
         }
         return t;
     }
@@ -505,8 +517,9 @@ public class RedisDistributeCacheService implements DistributeCacheService {
         String lockKey = this.getLockKey(key); // 获取锁key
         List<T> t = null;
         DistributedLock distributedLock = distributedLockFactory.getDistributedLock(lockKey);
+        boolean isLock = false;
         try {
-            boolean isLock = distributedLock.tryLock(); // 尝试获取锁
+            isLock = distributedLock.tryLock(); // 尝试获取锁
             if (!isLock) {
                 Thread.sleep(THREAD_SLEEP_MILLISECONDS);
                 return queryWithMutexListWithoutArgs(keyPrefix, clazz, dbFallback, timeout, timeUnit);
@@ -524,10 +537,13 @@ public class RedisDistributeCacheService implements DistributeCacheService {
             }
             this.set(key, t, timeout, timeUnit); // 数据库中有数据，设置缓存
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             logger.error("query data with mutex list|{}", e.getMessage());
             throw new RuntimeException(e);
         } finally {
-            distributedLock.unlock(); // 释放锁
+            if (isLock) {
+                distributedLock.unlock(); // 释放锁
+            }
         }
         return t;
     }
@@ -540,8 +556,9 @@ public class RedisDistributeCacheService implements DistributeCacheService {
         String lockKey = this.getLockKey(key);
         DistributedLock distributedLock = distributedLockFactory.getDistributedLock(lockKey);
         ThreadPoolUtils.execute(() -> {
+            boolean isLock = false;
             try {
-                boolean isLock = distributedLock.tryLock();
+                isLock = distributedLock.tryLock();
                 if (isLock) {
                     T newT = null;
                     String value = stringRedisTemplate.opsForValue().get(key); // 再次检查缓存
@@ -561,10 +578,13 @@ public class RedisDistributeCacheService implements DistributeCacheService {
                     }
                 }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 logger.error("build cache | {}", e.getMessage());
                 throw new RuntimeException(e);
             } finally {
-                distributedLock.unlock(); // 释放锁
+                if (isLock) {
+                    distributedLock.unlock(); // 释放锁
+                }
             }
         });
     }
@@ -573,8 +593,9 @@ public class RedisDistributeCacheService implements DistributeCacheService {
         String lockKey = this.getLockKey(key);
         DistributedLock distributedLock = distributedLockFactory.getDistributedLock(lockKey);
         ThreadPoolUtils.execute(() -> {
+            boolean isLock = false;
             try {
-                boolean isLock = distributedLock.tryLock();
+                isLock = distributedLock.tryLock();
                 if (isLock) {
                     T newT = null;
                     String value = stringRedisTemplate.opsForValue().get(key); // 再次检查缓存
@@ -594,10 +615,13 @@ public class RedisDistributeCacheService implements DistributeCacheService {
                     }
                 }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 logger.error("build cache | {}", e.getMessage());
                 throw new RuntimeException(e);
             } finally {
-                distributedLock.unlock(); // 释放锁
+                if (isLock) {
+                    distributedLock.unlock(); // 释放锁
+                }
             }
         });
     }
@@ -606,8 +630,9 @@ public class RedisDistributeCacheService implements DistributeCacheService {
         String lockKey = this.getLockKey(key);
         DistributedLock distributedLock = distributedLockFactory.getDistributedLock(lockKey);
         ThreadPoolUtils.execute(() -> {
+            boolean isLock = false;
             try {
-                boolean isLock = distributedLock.tryLock();
+                isLock = distributedLock.tryLock();
                 if (isLock) {
                     List<T> newT = null;
                     String value = stringRedisTemplate.opsForValue().get(key); // 再次检查缓存
@@ -627,10 +652,13 @@ public class RedisDistributeCacheService implements DistributeCacheService {
                     }
                 }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 logger.error("build cache | {}", e.getMessage());
                 throw new RuntimeException(e);
             } finally {
-                distributedLock.unlock(); // 释放锁
+                if (isLock) {
+                    distributedLock.unlock(); // 释放锁
+                }
             }
         });
     }
@@ -639,8 +667,9 @@ public class RedisDistributeCacheService implements DistributeCacheService {
         String lockKey = this.getLockKey(key);
         DistributedLock distributedLock = distributedLockFactory.getDistributedLock(lockKey);
         ThreadPoolUtils.execute(() -> {
+            boolean isLock = false;
             try {
-                boolean isLock = distributedLock.tryLock();
+                isLock = distributedLock.tryLock();
                 if (isLock) {
                     List<T> newT = null;
                     String value = stringRedisTemplate.opsForValue().get(key); // 再次检查缓存
@@ -660,10 +689,13 @@ public class RedisDistributeCacheService implements DistributeCacheService {
                     }
                 }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 logger.error("build cache | {}", e.getMessage());
                 throw new RuntimeException(e);
             } finally {
-                distributedLock.unlock(); // 释放锁
+                if (isLock) {
+                    distributedLock.unlock(); // 释放锁
+                }
             }
         });
     }
