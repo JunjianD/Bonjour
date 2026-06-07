@@ -3,7 +3,7 @@
 [English](README.md "View English version") | 中文
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Static Badge](https://img.shields.io/badge/Bonjour-demo-blue.svg)](http://117.72.85.211:8898/ "点击访问在线演示")
+[![Static Badge](https://img.shields.io/badge/Bonjour-demo-blue.svg)](https://bonjour-chat.online "点击访问在线演示")
 
 ![Bonjour](docs/bonjour_logo.png)
 
@@ -33,12 +33,11 @@ Bonjour 是一套基于 **JDK 21**，结合 **Spring Boot 3** 与 **Spring Cloud
 
 ## 在线演示
 
-- lena-test/lena-test
-- lenatest1/lenatest1
-- lenatest2/lenatest2
-- lenatest3/lenatest3
+- pinkpig/pinkpig
+- yellowduck/yellowduck
+- bluepigeon/bluepigeon
 
-[演示地址](http://117.72.85.211:8898/ "点击访问在线演示")
+[演示地址](https://bonjour-chat.online "点击访问在线演示")
 
 ## 前端
 

@@ -3,7 +3,7 @@
 English | [中文](README_cn.md "查看中文版")
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Static Badge](https://img.shields.io/badge/Demo-Bonjour-blue.svg)](http://117.72.85.211:8898/ "Click to visit the online demo")
+[![Static Badge](https://img.shields.io/badge/Demo-Bonjour-blue.svg)](https://bonjour-chat.online "Click to visit the online demo")
 
 ![Bonjour](docs/bonjour_logo.png)
 
@@ -36,12 +36,11 @@ deployment capabilities
 
 ## Online Demo
 
-- lena-test / lena-test
-- lenatest1 / lenatest1
-- lenatest2 / lenatest2
-- lenatest3 / lenatest3
+- pinkpig / pinkpig
+- yellowduck / yellowduck
+- bluepigeon / bluepigeon
 
-[Demo Address](http://117.72.85.211:8898/ "Click to visit the online demo")
+[Demo Address](https://bonjour-chat.online "Click to visit the online demo")
 
 ## Frontend
 
